@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>9B8731EB-A3A2-40A8-8BAC-391396558CAC</string>
+	<key>IDESourceControlProjectName</key>
+	<string>ParEGOIteration1</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>21AA6D6952CB33843BF8F4CBFC4C3E5E9632C93E</key>
+		<string>github.com:CristinaCristescu/ParEGO.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>ParEGOIteration1/ParEGOIteration1.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>21AA6D6952CB33843BF8F4CBFC4C3E5E9632C93E</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>github.com:CristinaCristescu/ParEGO.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>21AA6D6952CB33843BF8F4CBFC4C3E5E9632C93E</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>21AA6D6952CB33843BF8F4CBFC4C3E5E9632C93E</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ParEGO</string>
+		</dict>
+	</array>
+</dict>
+</plist>
