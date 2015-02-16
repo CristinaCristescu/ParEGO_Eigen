@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VariablesViewState
+   version = "1.0">
+   <ContextStates>
+      <ContextState
+         contextName = "universe::s2(double**, double*, double*, double, int, int, Eigen::Matrix&lt;double, -1, -1, 0, -1, -1&gt;):ParEGOIteration1.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "universe::weighted_distance(double*, double*, double*, double*, int):ParEGOIteration1.cpp">
+      </ContextState>
+      <ContextState
+         contextName = "universe::iterate_ParEGO():ParEGOIteration1.cpp">
+         <PersistentStrings>
+            <PersistentString
+               value = "(double)*(*(popx))">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+   </ContextStates>
+</VariablesViewState>
