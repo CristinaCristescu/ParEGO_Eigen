@@ -454,6 +454,7 @@ SearchSpace::SearchSpace(const char* name, int max_iter)
     fObjectiveFunctionName = name;
     SetSearch();
     init_arrays(max_iter);
+    alph = 1.0;
 
 }
 

@@ -209,7 +209,7 @@ universe::universe(int x)
 {
     Debug=false;
     best_ever=1;
-    MAX_ITERS = 250;
+    MAX_ITERS = 100;
 }
 
 void universe::setweights()
@@ -237,7 +237,7 @@ int main(int argc, char **argv)
     unsigned int seed=47456536;
     srand(seed);
     
-    string function = "f_dtlz2a";
+    string function = "f_vlmop2";
     U.setspace(function.c_str());
     U.setweights();
     U.setDACE();
@@ -328,19 +328,19 @@ void universe::iterate_ParEGO()
     space->fMeasuredFit[iter+1]=space->myfit(iter+1, iter+1);
     
     
-    printf("%d ", iter+1+prior_it);
+    //printf("%d ", iter+1+prior_it);
     for(int d=1;d <=space->fSearchSpaceDim; d++)
         printf("%lg ", space->fXVectors[iter+1][d]);
-    printf("decision\n");
-    
-    printf("%d ", iter+1);
+    //printf("decision\n");
+    printf("\n");
+    //printf("%d ", iter+1);
     for(int i=1;i<=space->fNoObjectives;i++)
     {
-        printf( "%lg ", space->fCostVectors[iter+1][i]);
+        //printf( "%lg ", space->fCostVectors[iter+1][i]);
         //fprintf(plotfile, "%.5lf ", ff[iter+1][i]);
     }
     //fprintf(plotfile, "\n");
-    printf("objective\n");
+    //printf("objective\n");
     
     //cout<<"ymin"<<model->ymin<<"\n";
 
@@ -379,14 +379,15 @@ void universe::init_ParEGO()
         for(int i=1;i<=iter;i++)
         {
             space->fMeasuredFit[i]=space->myfit(i,i);
-            printf( "%d ", i+prior_it);
+            //printf( "%d ", i+prior_it);
             for(int d=1;d<=space->fSearchSpaceDim;d++)
                 printf( "%.5lf ", space->fXVectors[i][d]);
-            printf("decision\n");
-            printf("%d ", i+prior_it);
-            for(int k=1;k<=space->fNoObjectives;k++)
-                printf("%.5lg ", space->fCostVectors[i][k]);
-            printf("objective\n");
+            //printf("decision\n");
+            printf("\n");
+            //printf("%d ", i+prior_it);
+            //for(int k=1;k<=space->fNoObjectives;k++)
+                //printf("%.5lg ", space->fCostVectors[i][k]);
+            //printf("objective\n");
         }
     }while(0);
 }

@@ -28,10 +28,7 @@ WeightVector::WeightVector(int noobjectives)
     snake_wv();
 }
 
-int static mypow(int x, int expon)
-{
-    return ((int)(pow((double)x, (double)expon)));
-}
+
 
 void WeightVector::changeWeights(int iter, double* newvector)
 {
@@ -82,7 +79,7 @@ void WeightVector::snake_wv()
     
     n=N;
     
-    while(m<mypow(N,fobjectives))
+    while(m<pow(N,fobjectives))
     {
         reverse(m);
         d--;
@@ -97,14 +94,14 @@ void WeightVector::snake_wv()
     //  for(i=0;i<pow(s,k);i++)
     //  print_vec(wv[i],k);
     
-    for(i=0;i<mypow(N,fobjectives);i++)
+    for(i=0;i<pow(N,fobjectives);i++)
     {
         for(j=0;j<fobjectives;j++)
             dwv[i][j]=(double)wv[i][j]/(N-1.0);
     }
     
     count=0;
-    for(i=0;i<mypow(N,fobjectives);i++)
+    for(i=0;i<pow(N,fobjectives);i++)
     {
         sum=0;
         for(j=0;j<fobjectives;j++)

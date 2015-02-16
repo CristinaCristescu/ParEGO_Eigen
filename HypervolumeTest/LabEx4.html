@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<!-- saved from url=(0064)http://www.cs.manchester.ac.uk/pgt/COMP61032/COMP61032.lab1.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Lab Exercise 4: Bi-objective Constrain Satisfaction Problem: MAX-SAT-ONE</title><style type="text/css">
+body {
+  padding-left: 100px; padding-right: 100px;
+  font-family: Helvetica, Arial;
+  }
+  table {
+  border: solid;
+  }
+  ul
+  {
+  list-style-type: none;
+  padding: 10px;
+  margin: 0;
+  }
+	</style></head>
+
+<body>
+<h1>COMP60342</h1>
+<h1>Lab Exercise 4: Bi-objective Constraint Satisfaction Problem: MAX-SAT-ONE</h1>
+
+<p>Duration: <i>1 week</i></p><p>&nbsp;</p><p>
+
+</p><hr>
+<h3>Advice</h3>
+
+<b>WARNING:</b> This lab is designed to take <b>1 week</b> of work.
+You are strongly advised to make a start and seek help 
+in the afternoon lab session on 2nd May.
+
+<p>
+For this assignment, <b>you MAY use code taken from other sources</b>.
+If you do, please indicate it in your source code. Also, please check
+that the code functions correctly.
+</p>
+<hr>
+
+<h2>Aims</h2>
+
+To gain experience of multiobjective optimization. To become
+familiar with another NP-hard combinatorial optimization problem, the
+MAX-SAT-ONE problem which is based on the constraint satisfaction problem, 3-SAT.
+
+<h2>Learning Outcomes</h2>
+
+On successful completion of this exercise, a student will:
+<ol>
+<li>Understand the MAX-SAT problem and its importance as
+a general problem class with numerous applications.
+</li><li>Have seen a multiobjective version of the problem and
+    appreciated the challenge it poses.
+</li><li>Have designed and implemented their own solution method(s) for solving the problem.
+</li><li>Have tuned and improved their method(s).
+</li><li>Have understood basics of performance assessment in
+    multiobjective optimization.
+</li><li>Have performed an analysis of the performance or their
+    method(s) in terms of quality and running time. 
+</li><li>Have understood some concepts behind the design of evolutionary multiobjective optimizers including archiving, elitism, selection and diversity maintenance.
+</li></ol>
+
+<hr>
+<h2>Lab Summary</h2>
+
+<p>
+The lab is marked out of 20. The lab will contribute 25&#37; 
+of your coursework mark, or 10&#37; to you overall mark.
+</p>
+
+<p><b>Practical task (12 Marks)</b> Design and implement one or more optimization
+algorithms for
+  solving a multiobjective version of the MAX 3-SAT problem, called
+  MAX-SAT-ONE, and test and
+tune your method(s). Write up your results and testing
+method in a <b>Report</b> for marking. 
+</p>
+
+<p>
+<b>Written exercises (8 marks)</b> Answer questions related to the
+MAX-SAT problem and to Multiobjective Optimization. Submit 
+your answers to these along with your report from the practical.
+</p>
+
+<h3>Marking Procedure</h3>
+
+<Big><font color=navy>You will hand in <b>written work</b> to SSO by
+    9.00am, May 9th.</font></Big>
+The written work you must hand in is clearly indicated.
+
+<p>Please save your code by the morning of May 9th and do not adjust
+  it afterwards. We may ask to check it.
+
+</p><p>
+<b>The deadline is 9th May, 9am.
+</b>
+</p>
+
+<hr>
+<h2>Background</h2>
+
+<h3>MAX-SAT Problem</h3>
+
+<p>
+The SAT (or Boolean Satisfiability) Problem is one of the most important problems in theoretical computer science since it is the first problem to be shown to be NP-Complete and is central to many attacks on the P=?NP question. Practically, SAT is a problem in logic that asks whether a given set of logical statements (or clauses) containing some free variables, which can take truth values of 0 or 1, are satisfiable or not. SAT has many applications, including Elecronic Circuit Verification, Planning (e.g., air-traffic control), Scheduling, Cryptanalysis.
+</p>
+<p>SAT as defined above is a decision problem. MAX-SAT is the optimization version of the same problem. We will next define the <em>single-objective</em> version of this problem.
+</p>
+
+<p>
+
+<h4>(Single-objective) MAX-3-SAT</h4>
+
+<table cellpadding=8>
+<tr>
+<td>
+INSTANCE: Set of <i>n</i> variables. Set of <i>c</i> clauses, where
+each clause consists of a disjunction of 3 literals (i.e., variables or their negations).</td>
+</tr>
+<tr>
+<td>
+OPTIMIZATION PROBLEM: Find an assignment of truth values to the
+variables such that the number of clauses that is satisfied is maximized.
+</td></tr>
+</table>
+
+<p>
+Note: when the number of literals in a clause is not specified, the
+problem is just called MAX-SAT.
+</p>
+
+<p>
+<b>Example:</b>
+
+Let's say we have three Boolean variables <i>x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub></i>, and we have the following three clauses (each of 3 literals) to satisfy: <br>
+</p>
+<p>
+<i>
+(x<sub>1</sub> &or; x<sub>2</sub> &or; &not;x<sub>3</sub>) &and; (x<sub>3</sub> &or; &not;x<sub>2</sub> &or; &not;x<sub>1</sub>) &and; (x<sub>1</sub> &or; &not;x<sub>2</sub> &or; &not;x<sub>3</sub>)
+</i></p>
+<p>
+where <i>&or;</i> stands for OR (i.e., disjunction), <i>&and;</i> stands for AND, and <i>&not;</i> stands for NOT (i.e. negation).
+</p>
+<p>
+An assignment of variables that maximises the number of clauses satisfied (=3) is <i>x<sub>1</sub>=1, x<sub>2</sub>=1, x<sub>3</sub>=1</i>. (Check this)
+
+<h4>Bi-objective Problem: MAX-SAT-ONE</h4>
+
+<p>
+The bi-objective MAX-SAT-ONE that we consider is a simple
+extension to the single-objective problem MAX-3-SAT defined above.
+</p>
+
+<table cellpadding=8>
+<tr>
+<td>
+INSTANCE: Set of <i>n</i> variables. Set of <i>c</i> clauses, where
+each clause consists of a disjunction of 3 literals (i.e., variables or their negations).</td>
+</tr>
+<tr>
+<td>OPTIMIZATION PROBLEM: Find an assignment of truth values to the
+variables such that the number of clauses that is satisfied is
+maximized and simultaneously 
+the number of variables set to true is maximized.
+</td>
+</tr>
+</table>
+
+<p>Of course, as with most multiobjective problems, there is unlikely
+to be a solution that optimizes both objectives
+  simultaneously. Rather,
+there will be a set of optimal tradeoffs, the Pareto optimal set. Each
+  member 
+of this set is optimal in the sense that it is impossible
+to improve on both objectives simultaneously - any improvement in one objective
+necessarily leads to a loss in the other objective.
+</p>
+
+<hr>
+<h2>Task 1: Programming and Experimental Work (12 marks)</h2>
+
+You will design, implement and test one or more algorithms for
+solving three MAX-SAT-ONE instances. The instances to solve are
+given below. Some design hints are also given for a simple approach, 
+but these need not be followed.
+
+<h3>Input Format and Problem Instances</h3>
+
+Your algorithm should be able to read in an instance of the
+MAX-SAT-ONE problem in
+this format.
+
+<pre>
+c some comments
+c are given here at the 
+c top of the file
+c
+p cnf 3 4
+1 -2 0
+-1 2 -3 0
+-3 2 0
+1 3 0
+</pre>
+After the comment lines (beginning with <TT>c</TT>) there is a single line
+that begins <TT>p cnf</TT> and gives the number of variables <i>n</i> and the number of
+clauses <i>c</i>. After that each line is a clause, consisting of a
+sequence of non-null numbers, which denote the corresponding variable 
+(if the number is positive) or its negation (if it is negative). Each
+line is ended with a 0.
+</p>
+
+<p>
+The three instances to be solved are:<br>
+<a href="dubois20.cnf">dubois20.cnf</a><br>
+<a href="aim-100-1_6-no-3.cnf">aim-100-1_6-no-3.cnf</a><br>
+<a href="aim-200-3_4-yes1-2.cnf">aim-200-3_4-yes1-2.cnf</a>
+</p>
+
+Here is some C code
+called <a href="evaluate_MAXSAT.c">evaluate_MAXSAT.c</a> that
+reads in an instance file and a candidate solution file - a single
+truth assignment for each variable - and outputs the calculated objective
+values.
+
+Here is a candidate solution file <a href="bool.1.txt">bool.1.txt</a>,
+which is a Boolean vector of size <i>n</i>=100.
+
+Do 
+<pre>
+> gcc evaluate_MAXSAT.c -o eval -lm
+> ./eval aim-100-1_6-no-3.cnf bool.1.txt
+</pre>
+and you should see two numbers output at the bottom. These are the two
+objective function values obtained for the given candidate solution.
+
+
+<h3>Output Format</h3>
+
+<b>Your algorithm should return a Pareto front with at most 100 points in it</b>.
+
+<p>
+The output should be in this format:</p>
+
+<pre>
+obj1 obj2
+obj1 obj2
+.
+.
+.
+obj1 obj2
+</pre>
+and be at most 100 lines long in total. This file can be read by code
+to assess how good your set of objective values found is, as follows.
+
+
+<h3>Performance assessment: The Hypervolume</h3>
+
+<p>
+To assess the performance of your algorithm, 
+you shall report the <em>hypervolume</em> of the region
+ dominated by your (up to 100) points found. The hypervolume
+ will be measured with respect to a reference point equal to the zero
+ vector:  (0,0).</p>
+
+<p>
+To do hypervolume calculations yourself, you will use some software provided.
+Download this <a href="hyp_vol.tar.gz">tar archive</a>. Then do
+<pre>
+>tar -zxvf hyp_vol.tar.gz
+>cd hv-1.3-src/
+>make clean
+>make
+</pre>
+
+<p>This should give you an executable, hv, that reads a file containing points, 
+one per line, and outputs its hypervolume.  Blank lines in the input
+  file can be used to separate different sets of points; the hv code
+  will calculate a hypervolume for each. Try it with</p>
+
+<pre>
+> ./hv ../test.dat -r "0 0"
+</pre>
+
+<p>
+The -r "0 0" option means to calculate the hypervolume relative to the
+zero vector. If you look in the file <a href="test.dat">test.dat</a>, you should see that there are two sets of points separated by a blank line, which is why two hypervolumes are calculated.
+</p>
+<p>
+You will also note that the file test.dat has all the numbers as
+negative. This is because hv assumes minimization optimization
+problems, so we need to take the negative of all values, before 
+submitting this to hv.</p>
+
+(See the README.txt file for more detals on the hypervolume calculation code.)
+
+<h4>Plotting results</h4>
+
+<p>You can also plot the Pareto front generated by any single run of your
+algorithm, e.g. by editing and using the gnuplot
+  script <a href="gnuplotscript.plot">gnuplotscript.plot</a>, 
+which can be run like this</p>
+<pre>
+> gnuplot "gnuplotscript.plot"
+</pre>
+and produces a plot like this:<br>
+<img src="moo.gif">
+<p>
+An equivalent file "moo.ps" is also generated, 
+which you can use in your report.
+Of course, you could alter this script, e.g. to plot the results of 
+more than one algorithmm, or set of parameters.
+</p>
+
+<h3>Collecting and Reporting Your Results</h3>
+
+<p>
+If your
+algorithm is stochastic, you should report the mean and standard
+deviation for 30 independent runs (at whatever point you decided to stop your
+method(s) ).
+</p>
+
+<p>Ideally, you should tune parameters a bit, and make some comparison of performance before and after.</p>
+
+<p>
+Marks will be awarded for good results, but only in so far as these
+have been obtained by clever design of the algorithm, or by good
+(but not excessive) testing and tuning. Running your algorithm on 100
+machines for a week is NOT NECESSARY. PLEASE DON'T DO THIS !
+
+<h3>Contents of the Report</h3>
+
+Use common sense to judge what makes a good report. I am looking for
+evidence of good design and implementation, and some testing and
+tuning that indicates how any parameter values or algorithm components 
+were evaluated. In particular, marks will be awarded for
+<p>
+(i) an abstract and introduction
+(ii) a complete description of your algorithm(s), including all final
+parameter settings<br>
+(iii) description of how you improved or tuned your algorithm<br>
+(iv) good description (including plots and or statistics) of your
+algorithm's performance, and any comparisons done<br>
+(v) *quality of final results<br>
+(vi) *timings of your algorithm
+
+<p>
+*Both quality and time taken (function evaluations used) may be taken into account.
+
+
+<h3>Hints for a Simple Approach</h3>
+
+You could solve this problem by adapting the evolutionary algorithm
+or simulated annealing algorithm from last week.
+
+<p>
+To do that for the evolutionary algorithm, you would need to do at
+least the following:
+<ul>
+<li>- let solutions be binary strings and initialize them correctly</li>
+<li>- update the mutation operator to work with binary strings</li>
+<li>- let solutions have fitness vectors (instead of scalars)
+e.g. implemented as an array of values</li>
+<li>- write a new evaluation function for the MAXSATONE problem. It should return or
+  modify the fitness vector</li>
+<li>- change the tournament selection procedure to a selection procedure based on
+multiobjective fitness (e.g.\ nondominated sorting, nondominated
+ranking)</li>
+<li>- have a population size of 100 and return that as the output.</li>
+</ul>
+
+<p>
+Up to 8 marks may be awarded for the approach above together with experiments
+to tune parameters and final results.
+
+<p>
+For more marks, add elitism and/or archiving, add diversity
+maintenance, do a more complicated selection procedure (e.g. based
+on hypervolume), incorporate local search, or implement one or more
+substantially different search techniques. You could also accelerate
+your method by calculating only the change in fitness when
+a small change is made to an assignment (delta evaluation).
+
+<p>
+You may use any technique or combination of techniques that you have
+seen in the course, or from wider reading !
+
+
+<h3>Task 2: Written Exercises (8 marks)</h3>
+
+
+1 mark is available per question unless otherwise stated.
+
+<ol>
+<li>Which of the solutions in the following set of points is nondominated assuming the aim is to maximize objective 1, and to minimize objectives 2 and 3 ?<BR>
+
+{ (-5,-1,2), (1, -1, -1), (6, -4, 3), (5, 5, 5), (-1, 0, 2), (0, -5, 3) }<BR></LI>
+<li>An <em>archiving</em> algorithm can be useful to store a record of the "current best" results of a multiobjective optimization process. Consider the following archiving algorithm, which updates an archive set, A <br>
+<pre>
+A := &empty;
+iterationcounter:=0
+while there is a new point y to consider
+  A' := A &cup; {y}
+  A'' := A' \ {y in A' | &exist; y' in A', y' dominates y}
+  A := A''
+  iterationcounter := iterationcounter + 1
+end while
+output A
+</pre>
+Show that after the first iteration of this algorithm, the archive set A will always have a size (cardinality) in the range [1, iterationcounter].
+</li>
+<li>
+An archiving algorithm 
+like the one above can lead to archives that are too large for efficient operation of a search method. To keep the archive smaller, several points close together in objective space can be represented by just one of the points (with the others being removed). To do this, a grid just larger than the poins currently in the archive can be used. The grid should have an equal number of divisions in each objecive. In each grid cell, only one point (it doesn't matter which) is kept. Give an efficient algorithm for reducing the archive using this grid method. Derive its time complexity, explaining any variables you use.
+</li>
+<li>Two approximation sets A and B have hypervolumes H(A) and H(B). If 
+H(A) > H(B) does this mean that A is necessarily preferred by a rational decision maker? Explain your answer carefully.</li>
+<!--li>It is often stated that in multiobjective optimization, one likes to obtain sets that have wide spread in objective space (sometimes referred to as "diversity" in objective space). Explain why spread or diversity is nevertheless arguably NOT a good measure of performance.
+<li>Nondominated sorting and nondominated ranking are two methods to assign dummy fitness values to a set of points. Show that the number of different fitness values assigned by nondominated sorting is never more than the number assigned by nondominated ranking, for the same set of points. (Recall: nondominated sorting identifies the nondominated solutions, assigns them rank 1 and removes them, then repeats this process recursively for the remaining points, adding 1 to the rank each time; nondominated ranking simply assigns the rank of a point as 1 plus the count of the number of other points that dominate it.)</li>-->
+<li>Show, using an example, that finding all the x minimizing the weighted sum 
+w<sub>1</sub>.f<sub>1</sub>(x) + (1-w<sub>1</sub>).f<sub>2</sub>(x) for all w<sub>1</sub> in the range [0,1] does not in general
+generate the complete Pareto front of a biobjective optimization problem.</li>
+<li>Give an expression that computes a delta evaluation for the
+  MAXSAT problem. That is, given a truth assignment <i>q</i> with
+  known number of satisfied clauses <i>f</i>, and given another
+  assignment <i>r</i>, where <i>r</i> is just <i>q</i> with one bit
+  flipped, state how to compute <i>f'</i> (the fitness of <i>r</i>)
+  from <i>q</i>, <i>r</i>, <i>f</i> and the index of the bit flipped. </li>
+<li>Briefly discuss two changes that need to be made to simulated annealing in order for it to be suitable as an algorithm for multiobjective optimization. Use  <a href="http://sci2s.ugr.es/docencia/metaheuristicas/SA-review_paper-2006.pdf">this paper</a> to help.</li> (2 marks).
+</ol>
+
+</body></html>

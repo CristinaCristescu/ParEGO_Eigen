@@ -40,7 +40,7 @@ public:
     double fIdealObjective[MAX_K]; //objective ideal points
     double fWeightVectors[MAX_K]; //weight vectors
         
-    double alph = 0.0; // power in the DTLZ2 and DTLZ4 test functions
+    double alph; // power in the DTLZ2 and DTLZ4 test functions
 
 
 public:
