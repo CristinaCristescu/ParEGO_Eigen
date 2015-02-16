@@ -7,7 +7,7 @@
 //
 
 #include <iostream>
-#include </Users/cristina/developer/eigen/eigen-eigen-1306d75b4a21/Eigen/Dense>
+#include </home/cristina/eigen/Eigen/Dense>
 
 using namespace std;
 
@@ -16,13 +16,17 @@ using namespace Eigen;
 int main()
 {
     clock_t t1,t2;
-    matrix[1000][1000]
-    MatrixXd mat(1000,1000);
+    //matrix[1000][1000]
+    MatrixXd matA(3,3);
+    MatrixXd matB(3,3);
+    MatrixXd mat(3,3);
+
     
-    mat << 1, 2,
-    3, 4;
+    matA << 3, 3, 3, 3,3,3,3,3,3;
+    matB << 5, 5, 5, 5,5,5,5,5,5;
+
     t1=clock();
-    mat= mat*mat;
+    mat= matA*matB;
     t2=clock();
     //Vector2d u(-1,1), v(2,0);
     std::cout << "Here is mat*mat:\n" << mat << std::endl;

@@ -7,7 +7,6 @@
 //
 #include <stdio.h>
 #include "Matrix.h"
-#include </Users/cristina/developer/eigen/eigen-eigen-1306d75b4a21/Eigen/Dense>
 
 MyMatrix::MyMatrix(size_t m, size_t n)
 {

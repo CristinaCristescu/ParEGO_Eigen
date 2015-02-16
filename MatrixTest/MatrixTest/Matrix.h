@@ -10,7 +10,7 @@
 #define __MatrixTest__Matrix__
 
 #include <stdio.h>
-#include </Users/cristina/developer/eigen/eigen-eigen-1306d75b4a21/Eigen/Dense>
+#include </home/cristina/eigen/Eigen/Dense>
 
 using namespace std;
 using namespace Eigen;
