@@ -181,7 +181,7 @@
 #define ComplexVectorIndexRangeChecking
 #define ComplexMatrixIndexRangeChecking
 // Use the Eigen library as a first trial for comparison and profiling.
-#include </Users/cristina/developer/eigen/eigen-eigen-1306d75b4a21/Eigen/Dense>
+#include </home/cristina/eigen/Eigen/Dense>
 //#include "nrutil.h"
 
 using namespace std;
@@ -1153,7 +1153,7 @@ int main(int argc, char **argv)
     //seed = atoi(argv[1]);
     srand(47456536);
     
-    sprintf(U.fitfunc, "f_dtlz2a");
+    sprintf(U.fitfunc, "f_vlmop2");
     //printf("function_name: %s\n", U.fitfunc);
 
     //if(argc>2)

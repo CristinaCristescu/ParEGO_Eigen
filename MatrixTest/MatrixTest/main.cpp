@@ -8,6 +8,15 @@
 
 #include <iostream>
 #include </home/cristina/eigen/Eigen/Dense>
+#define RN rand()/(RAND_MAX+1.0)
+#define HA 1000
+#define WA 1000
+#define WB 1000
+#define HB WA 
+#define WC WB   
+#define HC HA
+#define index(i,j,ld) (((j)*(ld))+(i))
+
 
 using namespace std;
 
@@ -16,20 +25,28 @@ using namespace Eigen;
 int main()
 {
     clock_t t1,t2;
-    //matrix[1000][1000]
-    MatrixXd matA(3,3);
-    MatrixXd matB(3,3);
-    MatrixXd mat(3,3);
-
-    
-    matA << 3, 3, 3, 3,3,3,3,3,3;
-    matB << 5, 5, 5, 5,5,5,5,5,5;
+      srand(1);
 
     t1=clock();
+    //matrix[1000][1000]
+    MatrixXf matA(HA,WA);
+    MatrixXf matB(HB,WB);
+    MatrixXf mat(HC,WC);
+
+    for(int i=0;i<HA;i++)
+        for(int j=0;j<WA;j++)
+            matA(index(i,j,HA))=(float)index(i,j,HA);
+    for(int i=0;i<HB;i++)
+        for(int j=0;j<WB;j++)
+            matB(index(i,j,HB))=index(i,j,HB);    
+    //cout<<"A:"<<matA<<"\n";
+    //cout<<"B:"<<matB<<"\nwuu";
+
+    
     mat= matA*matB;
-    t2=clock();
+    
     //Vector2d u(-1,1), v(2,0);
-    std::cout << "Here is mat*mat:\n" << mat << std::endl;
+    //std::cout << "Here is mat*mat:\n" << mat << std::endl;
     //std::cout << "Here is mat*u:\n" << mat*u << std::endl;
     //std::cout << "Here is u^T*mat:\n" << u.transpose()*mat << std::endl;
     //std::cout << "Here is u^T*v:\n" << u.transpose()*v << std::endl;
@@ -38,7 +55,7 @@ int main()
     //mat = mat*mat;
     //std::cout << "Now mat is mat:\n" << mat << std::endl;
     //code goes here
-    
+    t2=clock();
     float diff ((float)t2-(float)t1);
     float seconds = diff / CLOCKS_PER_SEC;
     cout<<seconds<<endl;

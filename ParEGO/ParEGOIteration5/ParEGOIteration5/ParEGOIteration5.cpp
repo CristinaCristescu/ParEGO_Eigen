@@ -308,8 +308,6 @@ void universe::iterate_ParEGO()
     //could change the GA not to be an object. have to think about adv and disadv
     // pop size inti 20
     GeneticAlgorithm ga(20, space->fSearchSpaceDim);
-    if(iter==48)
-        cout<<"bal";
     ga.run(space, model, iter, best_x, &best_imp);
     
        // END GA code
