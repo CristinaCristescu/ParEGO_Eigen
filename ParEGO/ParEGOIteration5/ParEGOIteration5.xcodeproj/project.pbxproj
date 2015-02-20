@@ -232,6 +232,11 @@
 		6B7320D71A7F98F0006EBBFF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/cristina/eigen/eigen-eigen-1306d75b4a21/Eigen/",
+				);
 				PRODUCT_NAME = ParEGOIteration5;
 			};
 			name = Debug;
@@ -239,6 +244,11 @@
 		6B7320D81A7F98F0006EBBFF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/cristina/eigen/eigen-eigen-1306d75b4a21/Eigen/",
+				);
 				PRODUCT_NAME = ParEGOIteration5;
 			};
 			name = Release;
