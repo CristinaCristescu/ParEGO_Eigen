@@ -166,7 +166,7 @@
 #define INFTY 1.0e35;
 // Use the Eigen library as a first trial for comparison and profiling.
 
-#include <Dense>
+#include </home/cristina/eigen/Eigen/Dense>
 
 #include "SearchSpace.h"
 #include "WeightVector.h"

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <vector>
 
-#include <Dense>
+#include </home/cristina/eigen/Eigen/Dense>
 #include "SearchSpace.h"
 
 using namespace::Eigen;
