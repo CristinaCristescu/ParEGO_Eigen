@@ -1,0 +1,33 @@
+
+
+
+
+CC = nvcc -Wno-deprecated
+LD = nvcc -Wno-deprecated
+INCLUDE = -I /home/cristina/eigen/Eigen
+CFLAGS = $(INCLUDE) -O3 -finline-functions 
+TARGET = ParEGOIteration5
+ParEGOIteration5 : ParEGOIteration5.o GeneticAlgorithm.o SearchSpace.o WeightVector.o Utilities.o DACE.o 
+	$(LD) $(CFLAGS) -o ParEGOIteration5 ParEGOIteration5.o	 GeneticAlgorithm.o SearchSpace.o WeightVector.o Utilities.o DACE.o	
+
+WeightVector.o : WeightVector.cpp
+	$(CC) $(CFLAGS) -cpp WeightVector.cpp
+
+Utilities.o : Utilities.cpp
+	$(CC) $(CFLAGS) -cpp Utilities.cpp
+
+GeneticAlgorithm.o : GeneticAlgorithm.cpp 
+	$(CC) $(CFLAGS) -cpp GeneticAlgorithm.cpp
+
+SearchSpace.o : SearchSpace.cpp 
+	$(CC) $(CFLAGS) -cpp SearchSpace.cpp
+
+DACE.o : DACE.cpp
+	$(CC) $(CFLAGS) -cpp DACE.cpp
+
+ParEGO.o : ParEGOIteration5.cpp
+	$(CC) $(CFLAGS) -cpp ParEGOIteration5.cpp
+
+clean: 
+	@/bin/rm -f $(TARGET)	
+	@/bin/rm *.o
