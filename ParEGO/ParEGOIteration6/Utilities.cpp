@@ -12,6 +12,7 @@
 #include <vector>
 #include <utility>
 #include <iostream>
+#include <algorithm>
 
 #include </home/cristina/eigen/Eigen/Dense>
 
@@ -20,8 +21,6 @@
 
 namespace Utilities
 {
-    
-    
     void static latin_hyp(double **ax, int iter, int dim, double* xmin,
                           double* xmax)
     {
@@ -114,20 +113,5 @@ namespace Utilities
         }
     }
     
-    void static pr_sq_mat(Eigen::MatrixXd& m, int dim)
-    {
-        for (int i=0; i<dim; i++) {
-            for (int j=0; j<dim; j++) {
-                std::cout << m(i,j) << " ";
-            }
-            std::cout << "\n";
-        }
-    }
-    
-    void static pr_vec(Eigen::VectorXd& v, int dim)
-    {
-        for (int i=0; i<dim; i++)
-            std::cout << v(i) << " ";
-        std::cout << "\n";
-    }
+   
 };

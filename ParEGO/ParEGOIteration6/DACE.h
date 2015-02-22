@@ -27,9 +27,9 @@ private:
     double *gtheta;
     double *gp;
     double gymin;
-    MatrixXd pgR;
-    MatrixXd pInvR;
-    VectorXd pgy;
+    float** pgR;
+    float** pInvR;
+    float* pgy;
     double glik;
     double gz[76]; // an array holding the z values for the gaussian distribution
 
@@ -49,14 +49,14 @@ public:
     
 private:
     double correlation(double *xi, double *xj, double *theta, double *p, int dim);
-    double mu_hat(VectorXd& y, int iter);
-    double sigma_squared_hat(VectorXd& y);
+    double mu_hat(float* y, int iter);
+    double sigma_squared_hat(float* y);
     double weighted_distance(double *xi, double *xj);
     double predict_y(double **ax);
     double s2(double **ax);
-    void build_R(double **ax,MatrixXd& R);
-    void build_y(double *ay, VectorXd& y);
-    long double posdet(MatrixXd& R, int n);
+    void build_R(double **ax, float** R);
+    void build_y(double *ay, float* y);
+    long double posdet(float** R, int n);
     void init_gz();
     double standard_density(double z);
     double standard_distribution(double z);

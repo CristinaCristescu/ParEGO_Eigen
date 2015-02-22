@@ -19,7 +19,7 @@
 using namespace std;
 
 #include "DACE.h"
-
+#include "Cuda_Utilities.h"
 
 double static myabs(double v)
 {
@@ -161,9 +161,43 @@ double DACE::mu_hat(VectorXd& y, int iter)
     VectorXd one(fCorrelationSize);
     for(int i=0;i<fCorrelationSize;i++)
         one(i)=1;
-    //cout<<"Y"<<y;
-    //cout<<"INVR:"<<pInvR;
+    
+    float* one_transpose = (float*)malloc(1*fCorrelationSize*sizeof(float));
+    float* pInvRGPU = (float*)malloc(fCorrelationSize*fCorrelationSize*sizeof(float));
+
+    for (int index = 0; index < fCorrelationSize; index++)
+    {
+        one_transpose[index] = 1.0;
+    }
+    //cout << "Matrix cpu:\n"<< pInvR << "\n";
+    for (int i = 0; i < fCorrelationSize ; i++)
+        for (int j = 0; j < fCorrelationSize; j++)
+        {
+            pInvRGPU[j*fCorrelationSize+i] = pInvR(i,j); 
+        }
+    // cout << "Matrix gpu:\n";    
+    // for (int index = 0; index <fCorrelationSize*fCorrelationSize; index++)
+    //     cout << pInvRGPU[index] << " ";
+    // //cout << "\n"; 
+
+    float* y_gpu = (float*)malloc(fCorrelationSize*1*sizeof(float));
+    for (int index = 0; index < y.size(); index++)
+    {
+        y_gpu[index] = y(index); 
+    }
+
+    float* res = (float*)malloc(1*1*sizeof(float));
+    //cout<< "cucu\n";
+    matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
+              fCorrelationSize, 1, 1, 1,
+             one_transpose, pInvRGPU, y_gpu, res);
+
+    // cout << "Result gpu:\n";
+    // cout << *res;
+    // cout << "\n";
+    
     numerator = one.transpose()*pInvR*y;
+    //cout<<"Result cpu:\n" << numerator<<"\n";
     denominator = one.transpose()*pInvR*one;
     return(numerator/denominator);
     
@@ -640,7 +674,7 @@ double  DACE::expected_improvement(double yhat, double ymin, double s)
 double DACE::wrap_ei(double *x, int iter)
 {
     debug_iter = iter;
-    fprintf(stderr,"ITER5 %d\n", iter);
+    //fprintf(stderr,"ITER5 %d\n", iter);
     for(int d=1;d<=daceSpace->fSearchSpaceDim; d++)
     {    (*pax)[fCorrelationSize+1][d] = x[d];
         
@@ -650,21 +684,21 @@ double DACE::wrap_ei(double *x, int iter)
     // predict the fitness
     fit=predict_y(*pax);
     
-    fprintf(stderr,"predicted fitness in wrap_ei() = %.4lg\n", fit);
+    //fprintf(stderr,"predicted fitness in wrap_ei() = %.4lg\n", fit);
     
     
     // compute the error
     double ss;
     //ME: ss -least square error.
     ss=s2(*pax);
-    fprintf(stderr,"s^2 error in wrap_ei() = %.4lg\n", ss);
+    //fprintf(stderr,"s^2 error in wrap_ei() = %.4lg\n", ss);
     //fprintf(stderr,"%.9lf %.9lf \n", x[1], ss);
     
     
     // compute the expected improvement
     double ei;
     ei=expected_improvement(fit, gymin, sqrt(ss));
-    fprintf(stderr,"-ei in wrap_ei() = %.4lg\n", -ei);
+    //fprintf(stderr,"-ei in wrap_ei() = %.4lg\n", -ei);
     
     
     for(int d=1; d <= daceSpace->fSearchSpaceDim; d++)
