@@ -40,9 +40,9 @@ DACE::DACE(SearchSpace* space)
     double* gp = NULL;
     double ymin = 0;
     double gymin = 0;
-    MatrixXd pgR = MatrixXd();
+    float** pgR = NULL;
     MatrixXd pInvR = MatrixXd();
-    VectorXd pgy = VectorXd();
+    float* pgy = VectorXd();
     
     double glik = 0;
     
@@ -382,10 +382,6 @@ void DACE::buildDACE(bool change, int iter)
     for(int i=0;i<=fNoParamDACE+1;i++)
         bestparam[i]=(double *)calloc((fNoParamDACE+1),sizeof(double));
     
-    
-    
-    VectorXd y(fCorrelationSize);
-    build_y(*pay, y);
     //cout<<"y:"<<y;
     
     double best_lik=INFTY;
@@ -419,7 +415,7 @@ void DACE::buildDACE(bool change, int iter)
             //cout<< "THe MATRIX:"<<R<<"\n";
             pInvR = R.inverse();
             //cout<<"MATRIX INV IN CHANGE" <<InvR<<"\n";
-            gmu=mu_hat(y, iter);
+            gmu=mu_hat(*pay, iter);
             //fprintf(stderr,,"OK - mu %lg calculated\n", gmu);
             gsigma=sigma_squared_hat(y);
             //fprintf(stderr,,"OK - sigma %lg calculated\n", gsigma);
@@ -487,8 +483,7 @@ void DACE::buildDACE(bool change, int iter)
     //printf("det = %lg\n",det);
     pInvR = pgR.inverse();
     //cout<<"MATRIX INV" <<InvR<<"\n";
-    pgy = VectorXd(fCorrelationSize);
-    build_y(daceSpace->fMeasuredFit, pgy);
+    pgy = daceSpace->fMeasuredFit;
     /* ***************************** */
     
     //   fprintf(out,"predicted R matrix built OK:\n");
