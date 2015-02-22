@@ -3,9 +3,9 @@
 #include "cublas.h"
 #include <iostream>
 
-#define HA 1000
-#define WA 1000
-#define WB 1000
+#define HA 250
+#define WA 250
+#define WB 250
 #define HB WA 
 #define WC WB   
 #define HC HA  
