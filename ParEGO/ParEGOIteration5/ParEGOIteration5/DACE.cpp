@@ -640,7 +640,7 @@ double  DACE::expected_improvement(double yhat, double ymin, double s)
 double DACE::wrap_ei(double *x, int iter)
 {
     debug_iter = iter;
-    fprintf(stderr,"ITER5 %d\n", iter);
+    //fprintf(stderr,"ITER5 %d\n", iter);
     for(int d=1;d<=daceSpace->fSearchSpaceDim; d++)
     {    (*pax)[fCorrelationSize+1][d] = x[d];
         
@@ -650,21 +650,21 @@ double DACE::wrap_ei(double *x, int iter)
     // predict the fitness
     fit=predict_y(*pax);
     
-    fprintf(stderr,"predicted fitness in wrap_ei() = %.4lg\n", fit);
+    //fprintf(stderr,"predicted fitness in wrap_ei() = %.4lg\n", fit);
     
     
     // compute the error
     double ss;
     //ME: ss -least square error.
     ss=s2(*pax);
-    fprintf(stderr,"s^2 error in wrap_ei() = %.4lg\n", ss);
+    //fprintf(stderr,"s^2 error in wrap_ei() = %.4lg\n", ss);
     //fprintf(stderr,"%.9lf %.9lf \n", x[1], ss);
     
     
     // compute the expected improvement
     double ei;
     ei=expected_improvement(fit, gymin, sqrt(ss));
-    fprintf(stderr,"-ei in wrap_ei() = %.4lg\n", -ei);
+    //fprintf(stderr,"-ei in wrap_ei() = %.4lg\n", -ei);
     
     
     for(int d=1; d <= daceSpace->fSearchSpaceDim; d++)
