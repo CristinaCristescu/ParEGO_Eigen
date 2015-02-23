@@ -40,9 +40,8 @@ DACE::DACE(SearchSpace* space)
     double* gp = NULL;
     double ymin = 0;
     double gymin = 0;
-    float** pgR = NULL;
     MatrixXd pInvR = MatrixXd();
-    float* pgy = VectorXd();
+    VectorXd pgy = VectorXd();
     
     double glik = 0;
     
@@ -120,7 +119,7 @@ void DACE::build_R(double **ax, MatrixXd& R)
     
 }
 
-double DACE::s2(double **ax)
+double DACE::s2(double **ax, int iter)
 {
     if(Debug)
         printf("sigma: %f\n", gsigma);
@@ -136,93 +135,148 @@ double DACE::s2(double **ax)
         r(i) = correlation(ax[fCorrelationSize+1],ax[i+1],gtheta,gp,daceSpace->fSearchSpaceDim);
         //fprintf(stderr,"r[i]=%lg \n",r(i));
     }
-    
-//    double f1 = (r.transpose()*pInvR*r);
-//    printf("f1= %lg\n", f1);
-//    double f2 = 1 - r.transpose()*pInvR*r;
-//    printf("f2= %lg\n", f2);
-//    double f3 = 1-one.transpose()*pInvR*r;
-//    printf("f3= %lg\n", f3);
-//    double f4 = pow((1-one.transpose()*pInvR*r),2);
-//    printf("f4= %lg\n", f4);
-//    double f5 = pow((1-one.transpose()*pInvR*r),2)/(one.transpose()*pInvR*one);
-//    printf("f5= %lg\n", f5);
 
+    float* res1 = (float*)malloc(1*1*sizeof(float));
+    float* res2 = (float*)malloc(1*1*sizeof(float));
+    float* res3 = (float*)malloc(1*1*sizeof(float));
+
+    if (iter > 46) 
+    {
+        float* one_transpose = (float*)malloc(1*fCorrelationSize*sizeof(float));
+        float* pInvRGPU = (float*)malloc(fCorrelationSize*fCorrelationSize*sizeof(float));
+        float* r_gpu = (float*)malloc(fCorrelationSize*1*sizeof(float));
+
+        for (int index = 0; index < fCorrelationSize; index++)
+        {
+            one_transpose[index] = 1.0;
+            r_gpu[index] = r(index);
+        }
+        for (int i = 0; i < fCorrelationSize ; i++)
+            for (int j = 0; j < fCorrelationSize; j++)
+            {
+                pInvRGPU[j*fCorrelationSize+i] = pInvR(i,j); 
+            }
+        for (int index = 0; index < r.size(); index++)
+        {
+            r_gpu[index] = r(index); 
+        }
     
-    s2 = gsigma * (1- r.transpose()*pInvR*r +
-                   pow((1-one.transpose()*pInvR*r),2)/(one.transpose()*pInvR*one));
-    //fprintf(stderr, "s2= %lg\n", s2);
+        matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
+                  fCorrelationSize, 1, 1, 1,
+                  r_gpu, pInvRGPU, r_gpu, res1);
+        matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
+                  fCorrelationSize, 1, 1, 1,
+                 one_transpose, pInvRGPU, r_gpu, res2);
+        matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
+                  fCorrelationSize, 1, 1, 1,
+                  one_transpose, pInvRGPU, one_transpose, res3);
+    }
+    else
+    {
+        *res1 = r.transpose()*pInvR*r;
+        *res2 = one.transpose()*pInvR*r;
+        *res3 = one.transpose()*pInvR*one;
+    }
+
+    s2 = gsigma * (1- res1 + pow((1-res2),2)/(res3));
     return(s2);
 }
 
 double DACE::mu_hat(VectorXd& y, int iter)
 {
-    double numerator, denominator;
+    double denominator;
     VectorXd one(fCorrelationSize);
     for(int i=0;i<fCorrelationSize;i++)
         one(i)=1;
-    
-    float* one_transpose = (float*)malloc(1*fCorrelationSize*sizeof(float));
-    float* pInvRGPU = (float*)malloc(fCorrelationSize*fCorrelationSize*sizeof(float));
 
-    for (int index = 0; index < fCorrelationSize; index++)
+    float* numerator = (float*)malloc(1*1*sizeof(float));
+
+    if (iter > 46) 
     {
-        one_transpose[index] = 1.0;
-    }
-    //cout << "Matrix cpu:\n"<< pInvR << "\n";
-    for (int i = 0; i < fCorrelationSize ; i++)
-        for (int j = 0; j < fCorrelationSize; j++)
+        float* one_transpose = (float*)malloc(1*fCorrelationSize*sizeof(float));
+        float* pInvRGPU = (float*)malloc(fCorrelationSize*fCorrelationSize*sizeof(float));
+    
+        for (int index = 0; index < fCorrelationSize; index++)
         {
-            pInvRGPU[j*fCorrelationSize+i] = pInvR(i,j); 
+            one_transpose[index] = 1.0;
         }
-    // cout << "Matrix gpu:\n";    
-    // for (int index = 0; index <fCorrelationSize*fCorrelationSize; index++)
-    //     cout << pInvRGPU[index] << " ";
-    // //cout << "\n"; 
-
-    float* y_gpu = (float*)malloc(fCorrelationSize*1*sizeof(float));
-    for (int index = 0; index < y.size(); index++)
-    {
-        y_gpu[index] = y(index); 
-    }
-
-    float* res = (float*)malloc(1*1*sizeof(float));
-    //cout<< "cucu\n";
-    matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
-              fCorrelationSize, 1, 1, 1,
-             one_transpose, pInvRGPU, y_gpu, res);
-
-    // cout << "Result gpu:\n";
-    // cout << *res;
-    // cout << "\n";
+        //cout << "Matrix cpu:\n"<< pInvR << "\n";
+        for (int i = 0; i < fCorrelationSize ; i++)
+            for (int j = 0; j < fCorrelationSize; j++)
+            {
+                pInvRGPU[j*fCorrelationSize+i] = pInvR(i,j); 
+            }
+        // cout << "Matrix gpu:\n";    
+        // for (int index = 0; index <fCorrelationSize*fCorrelationSize; index++)
+        //     cout << pInvRGPU[index] << " ";
+        // //cout << "\n"; 
     
-    numerator = one.transpose()*pInvR*y;
-    //cout<<"Result cpu:\n" << numerator<<"\n";
+        float* y_gpu = (float*)malloc(fCorrelationSize*1*sizeof(float));
+        for (int index = 0; index < y.size(); index++)
+        {
+            y_gpu[index] = y(index); 
+        }
+    
+        //cout<< "cucu\n";
+        matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
+                  fCorrelationSize, 1, 1, 1,
+                 one_transpose, pInvRGPU, y_gpu, numerator);
+    }
+    else 
+    {
+        *numerator = one.transpose()*pInvR*y;
+    }
+   
     denominator = one.transpose()*pInvR*one;
     return(numerator/denominator);
     
 }
 
-double DACE::sigma_squared_hat(VectorXd& y)
+double DACE::sigma_squared_hat(VectorXd& y, int iter)
 {
-    double numerator, denominator;
+    double denominator;
     
     VectorXd one(fCorrelationSize);
     for(int i=0;i<fCorrelationSize;i++)
         one(i)=1;
     
+    //TO DO: GPU for vector * scalar
     VectorXd vmu=one*gmu;
-    //cout<<"GMU:"<<gmu<<"\n";
-    //cout<<vmu;
+
     VectorXd diff = y - vmu;
-    //cout<<diff;
-    numerator = diff.transpose()*pInvR*diff;
+
+    float* numerator = (float*)malloc(1*1*sizeof(float));
+
+    if (iter > 46)
+    {
+        float* diff_transpose = (float*)malloc(1*fCorrelationSize*sizeof(float));
+        float* pInvRGPU = (float*)malloc(fCorrelationSize*fCorrelationSize*sizeof(float));
+    
+        for (int index = 0; index < fCorrelationSize; index++)
+        {
+            diff_transpose[index] = diff(index);
+        }
+        for (int i = 0; i < fCorrelationSize ; i++)
+            for (int j = 0; j < fCorrelationSize; j++)
+            {
+                pInvRGPU[j*fCorrelationSize+i] = pInvR(i,j); 
+            }
+    
+        matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
+                  fCorrelationSize, 1, 1, 1,
+                  diff_transpose, pInvRGPU, y_gpu, numerator);
+    }
+    else 
+    {
+        *numerator = diff.transpose()*pInvR*diff;
+    }
+
     denominator = fCorrelationSize;
     
     return (numerator/denominator);
 }
 
-double DACE::predict_y(double **ax)
+double DACE::predict_y(double **ax, int iter)
 {
     double y_hat;
     VectorXd one(fCorrelationSize);
@@ -236,19 +290,40 @@ double DACE::predict_y(double **ax)
         //fprintf(stderr,"r[%di]=%.5lf ax[n+1][1]=%.5lf\n",i, r(i), ax[fCorrelationSize+1][1]);
     }
     
-    double intermidiate = ((r.transpose()*pInvR)*(pgy-(one*gmu)));
+    VectorXd diff = pgy-(one*gmu);
+
+    float* intermidiate = (float*)malloc(1*1*sizeof(float));
+
+    if (iter > 46) 
+    {
+        float* diff_transpose = (float*)malloc(1*fCorrelationSize*sizeof(float));
+        float* pInvRGPU = (float*)malloc(fCorrelationSize*fCorrelationSize*sizeof(float));
+        float* r_gpu = (float*)malloc(fCorrelationSize*1*sizeof(float));
+
+        for (int index = 0; index < fCorrelationSize; index++)
+        {
+            diff_transpose[index] = diff(index);
+            r_gpu[index] = r(index)
+        }
+        for (int i = 0; i < fCorrelationSize ; i++)
+            for (int j = 0; j < fCorrelationSize; j++)
+            {
+                pInvRGPU[j*fCorrelationSize+i] = pInvR(i,j); 
+            }
+    
+        matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
+                  fCorrelationSize, 1, 1, 1,
+                  r_gpu, pInvRGPU, diff_transpose, intermidiate);
+    }
+    else 
+    {
+        *intermidiate = r.transpose()*pInvR*diff;;
+    }
+
     y_hat = gmu + intermidiate;
     
     //fprintf(stderr,"y_hat=%f mu_hat=%f\n",y_hat, mu_hat);
     
-    /*
-     if((y_hat>100)||(y_hat<-100))
-     {
-     //      fprintf(out,"mu_hat=%.5lf theta=%.5lf p=%.5lf\n", mu_hat, theta[1], p[1]);
-     for(int i=1;i<=n;i++)
-     fprintf(out,"%.2f-%.2f log(r[i])=%le ", ax[n+1][1],ax[i][1] , log(r[i]));
-     }
-     */
     return(y_hat);
     
 }
@@ -476,7 +551,7 @@ void DACE::buildDACE(bool change, int iter)
     fCorrelationSize=iter;
     pax = &daceSpace->fXVectors;
     //ME: Carefull with the indexes!!! It starts from 1.
-    pgR = MatrixXd::Zero(fCorrelationSize,fCorrelationSize);
+    MatrixXd pgR = MatrixXd::Zero(fCorrelationSize,fCorrelationSize);
     build_R(*pax, pgR);
     posdet(pgR, fCorrelationSize);
     //long double det =  pgR.determinant();
