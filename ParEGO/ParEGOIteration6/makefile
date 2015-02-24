@@ -1,6 +1,6 @@
 
-CC=g++
-LD=g++
+CC=g++ -g
+LD=g++ -g
 NVCC=nvcc
 CFLAGS=-c -Wno-deprecated -O3 -finline-functions -I/usr/local/cuda-6.5/include 
 NVCCFLAGS = -c  

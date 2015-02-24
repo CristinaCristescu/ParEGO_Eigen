@@ -24,48 +24,48 @@ for(i=0;i<uHP;i++){
 }
 
 extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
-                          int HRes, int WRes,  
-                          float* A, float* B, float* C, float* Res)
+                          float* A, float* B, float* C)
 {
-    int HresAB = HA;
-    int WresAB = WB;
-    HRes = HresAB;
-    WRes = WC;
     // Not sure it should be here!
     cublasInit();
 
     cublasStatus status;
-    float* AA; float* BB; float* CC; float* resAB; float* res;
+    float* AA; float* BB; float* CC;
     /*ALLOCATE ON THE DEVICE*/
     status=cublasAlloc(HA*WA,sizeof(float),(void**)&AA);
     if (status != CUBLAS_STATUS_SUCCESS) 
     {
+        if (status == CUBLAS_STATUS_NOT_INITIALIZED)
+            fprintf(stderr, "CUBLAS_STATUS_NOT_INITIALIZED\n");
+        else if (status == CUBLAS_STATUS_INVALID_VALUE)
+            fprintf(stderr, "CUBLAS_STATUS_INVALID_VALUE\n");
+        else if (status == CUBLAS_STATUS_ALLOC_FAILED)
+            fprintf(stderr, "CUBLAS_STATUS_ALLOC_FAILED\n");
         fprintf (stderr, "!!!! device memory allocation error (AA)\n");
     }
 
     status=cublasAlloc(HB*WB,sizeof(float),(void**)&BB);
     if (status != CUBLAS_STATUS_SUCCESS) 
     {
+        if (status == CUBLAS_STATUS_NOT_INITIALIZED)
+            fprintf(stderr, "CUBLAS_STATUS_NOT_INITIALIZED\n");
+        else if (status == CUBLAS_STATUS_INVALID_VALUE)
+            fprintf(stderr, "CUBLAS_STATUS_INVALID_VALUE\n");
+        else if (status == CUBLAS_STATUS_ALLOC_FAILED)
+            fprintf(stderr, "CUBLAS_STATUS_ALLOC_FAILED\n");
         fprintf (stderr, "!!!! device memory allocation error (BB)\n");
     }
 
     status=cublasAlloc(HC*WC,sizeof(float),(void**)&CC);
     if (status != CUBLAS_STATUS_SUCCESS) 
     {
+        if (status == CUBLAS_STATUS_NOT_INITIALIZED)
+            fprintf(stderr, "CUBLAS_STATUS_NOT_INITIALIZED\n");
+        else if (status == CUBLAS_STATUS_INVALID_VALUE)
+            fprintf(stderr, "CUBLAS_STATUS_INVALID_VALUE\n");
+        else if (status == CUBLAS_STATUS_ALLOC_FAILED)
+            fprintf(stderr, "CUBLAS_STATUS_ALLOC_FAILED\n");
         fprintf (stderr, "!!!! device memory allocation error (CC)\n");
-    }
-
-
-    status=cublasAlloc(HA*WB,sizeof(float),(void**)&resAB);
-    if (status != CUBLAS_STATUS_SUCCESS) 
-    {
-        fprintf (stderr, "!!!! device memory allocation error (ResAB)\n");
-    }
-
-    status=cublasAlloc(HRes*WRes,sizeof(float),(void**)&res);
-    if (status != CUBLAS_STATUS_SUCCESS) 
-    {
-        fprintf (stderr, "!!!! device memory allocation error (ResAB)\n");
     }
 
     /*SET MATRIX*/
@@ -79,12 +79,6 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
     if (status != CUBLAS_STATUS_SUCCESS) 
     {
         fprintf (stderr, "!!!! device memory copy error (B)\n");
-    }
-
-    status=cublasSetMatrix(HC,WC,sizeof(float),C,HC,CC,HC);
-    if (status != CUBLAS_STATUS_SUCCESS) 
-    {
-        fprintf (stderr, "!!!! device memory copy error (C)\n");
     }
 
      /*for (int i=0;i<HA*WA;i++)
@@ -116,7 +110,7 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
      fprintf (stderr, "%d %d %d %d %d %d", HA, WA, HB, WB, HC, WC);
     fprintf(stderr,"hihi\n");*/
     /*KERNEL*/
-    cublasSgemm('n','n',HA,WB,WA,1,AA,HA,BB,HB,0,resAB,HresAB);
+    cublasSgemm('n','n',HA,WB,WA,1,AA,HA,BB,HB,0,C,HC);
 
     status = cublasGetError();
     if (status != CUBLAS_STATUS_SUCCESS) 
@@ -132,23 +126,9 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
             fprintf (stderr, "CUBLAS_STATUS_EXECUTION_FAILED\n");        
     }
 
-    cublasSgemm('n','n',HresAB,WC,WresAB,1,resAB,HresAB,CC,HC,0,res,HRes);
+    
 
-    status = cublasGetError();
-    if (status != CUBLAS_STATUS_SUCCESS) 
-    {
-        fprintf (stderr, "!!!! kernel execution error.\n");
-        if (status == CUBLAS_STATUS_NOT_INITIALIZED)
-            fprintf (stderr, "CUBLAS_STATUS_NOT_INITIALIZED\n");
-        else if (status == CUBLAS_STATUS_INVALID_VALUE)
-            fprintf(stderr, "CUBLAS_STATUS_INVALID_VALUE\n");  
-        else if (status == CUBLAS_STATUS_ARCH_MISMATCH) 
-            fprintf(stderr, "CUBLAS_STATUS_ARCH_MISMATCH\n");
-        else if (status == CUBLAS_STATUS_EXECUTION_FAILED)
-            fprintf (stderr, "CUBLAS_STATUS_EXECUTION_FAILED\n");        
-    }
-
-    cublasGetMatrix(HA,WC,sizeof(float),res,HA,Res,HA);
+    cublasGetMatrix(HC,WC,sizeof(float),CC,HC,C,HC);
     if (status != CUBLAS_STATUS_SUCCESS) 
     {
         fprintf (stderr, "!!!! device read error (Res)\n");
@@ -175,16 +155,6 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
         if (status != CUBLAS_STATUS_SUCCESS) 
         {
             fprintf (stderr, "!!!! memory free error (C)\n");
-        }
-        status = cublasFree(resAB);
-        if (status != CUBLAS_STATUS_SUCCESS) 
-        {
-            fprintf (stderr, "!!!! memory free error (resAB)\n");
-        }
-        status = cublasFree(res);
-        if (status != CUBLAS_STATUS_SUCCESS) 
-        {
-            fprintf (stderr, "!!!! memory free error (res)\n");
         }
 
         /* Shutdown */

@@ -349,7 +349,7 @@ void GeneticAlgorithm::run(SearchSpace* space, DACE* model, int iter, double* be
                 best_x[d]=popx[i][d];
         }
     }
-    //printf("ei= %lf\n", *best_imp);
+    printf("ei= %lf\n", *best_imp);
     if(improved==false)
     {
         fprintf(stderr, "GA found no improvement\n");
