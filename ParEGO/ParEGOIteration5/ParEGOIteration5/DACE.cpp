@@ -38,7 +38,6 @@ DACE::DACE(SearchSpace* space)
     double gsigma = 0;
     double* gtheta = NULL;
     double* gp = NULL;
-    double ymin = 0;
     double gymin = 0;
     MatrixXd pgR = MatrixXd();
     MatrixXd pInvR = MatrixXd();
