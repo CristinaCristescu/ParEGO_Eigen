@@ -16,6 +16,7 @@
 #include <iostream>
 #include <math.h>
 
+
 using namespace std;
 
 #include "DACE.h"
@@ -34,7 +35,7 @@ DACE::DACE(SearchSpace* space)
     daceSpace = space;
     fNoParamDACE=daceSpace->fSearchSpaceDim*2+2;
     ymin=INFTY;
-    gmu
+    gmu = 0 ;
     gsigma = 0;
     gtheta = NULL;
     gp = NULL;
@@ -282,8 +283,8 @@ double DACE::sigma_squared_hat(VectorXd& y, int iter)
         matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
                   1, fCorrelationSize,
                   diff_transpose, pInvRGPU, interm1);
-        matrixMuk(1, fCorrelationSize, fCorrelationSize, 1, 1, 1,
-                  interm1, diff, numerator);
+        matrixMul(1, fCorrelationSize, fCorrelationSize, 1, 1, 1,
+                  interm1, diff_transpose, numerator);
     }
     else 
     {
@@ -333,8 +334,8 @@ double DACE::predict_y(double **ax, int iter)
             }
     
         matrixMul(1, fCorrelationSize, fCorrelationSize, fCorrelationSize, 
-                  fCorrelationSize, 1, 1, 1,
-                  r_gpu, pInvRGPU, diff_transpose, interm1);
+                  fCorrelationSize, 1,
+                  r_gpu, pInvRGPU, interm1);
         matrixMul(1, fCorrelationSize, fCorrelationSize, 1, 1, 1,
                   interm1, diff_transpose, intermidiate);
     }

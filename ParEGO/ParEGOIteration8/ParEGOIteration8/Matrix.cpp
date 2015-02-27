@@ -9,10 +9,14 @@
 #include "Matrix.h"
 #include "Vector.h"
 
+#include "Cuda_Utilities.h"
+
 #include <stdio.h>
 #include <iostream>
 
 #define Debug_Matrix = false
+#define GPU true
+#define GPU_THRESHOLD 30
 
 MyMatrix::MyMatrix(size_t m, size_t n)
 {
@@ -49,18 +53,69 @@ MyMatrix& MyMatrix::operator=(const MyMatrix& A)
 const MyMatrix MyMatrix::operator*(const MyMatrix& A) const
 {
     MyMatrix result;
-    result.fMatrix = fMatrix*A.fMatrix;
-    result.fRows = result.fMatrix.rows();
-    result.fColumns = result.fMatrix.cols();
+    result.fRows = fRows;
+    result.fColumns = A.fColumns;
+
+    assert(fColumns == A.fRows);
+
+    if (fRows >= GPU_THRESHOLD || fColumns >= GPU_THRESHOLD || 
+        A.fRows >= GPU_THRESHOLD || A.fColumns >= GPU_THRESHOLD)
+    {
+        // Create the raw array like represantion for the GPU
+        float* this_matrix_gpu = (float*)fMatrix.data();
+        float* A_gpu = (float*)A.fMatrix.data();
+
+        //Result from the GPU.
+        float* result_gpu = (float*)malloc(fRows*A.fColumns*sizeof(float));
+
+        matrixMul(fRows, fColumns, A.fRows, A.fColumns, A.fColumns, fRows,
+                  this_matrix_gpu, A_gpu, result_gpu);
+
+        result.fMatrix = MatrixXd(fRows, A.fColumns);
+        for (int i = 0; i < result.fRows; i++)
+            for (int j = 0; j < result.fColumns; j++)
+            {
+                result.fMatrix(i,j) = result_gpu[j*result.fColumns+i];
+            }
+    }
+    else {
+        result.fMatrix = fMatrix*A.fMatrix;
+        
+    }
     return result;
 }
 
 const MyMatrix MyMatrix::operator*(const MyVector& A) const
 {
     MyMatrix result;
-    result.fMatrix = fMatrix*A.fVector;
-    result.fRows = result.fMatrix.rows();
-    result.fColumns = result.fMatrix.cols();
+    result.fRows = fRows;
+    result.fColumns = A.fN;
+
+    assert(fColumns == A.fN);
+
+    if (fRows >= GPU_THRESHOLD || A.fN >= GPU_THRESHOLD)
+    {
+        // Create the raw array like represantion for the GPU
+        float* this_matrix_gpu = (float*)fMatrix.data();
+        float* A_gpu = (float*)A.fVector.data();
+
+        //Result from the GPU.
+        float* result_gpu = (float*)malloc(fRows*1*sizeof(float));
+
+        matrixMul(fRows, fColumns, A.fN, 1, 1, fRows,
+                  this_matrix_gpu, A_gpu, result_gpu);
+
+        result.fMatrix = MatrixXd(fRows, A.fN);
+        for (int i = 0; i < result.fRows; i++)
+            for (int j = 0; j < result.fColumns; j++)
+            {
+                result.fMatrix(i,j) = result_gpu[j*result.fColumns+i];
+            }
+    }
+    else 
+    {
+        result.fMatrix = fMatrix*A.fVector;
+    }    
     return result;
 }
 
@@ -169,13 +224,54 @@ const MyVector MyVector::operator*(const MyVector& A) const
 
 const MyMatrix MyVector::operator*(const MyMatrix& A) const
 {
-    MyMatrix result(1,A.fColumns);
-    //std::cerr << result.fMatrix;
-    //std::cerr << A.fMatrix;
-    result.fMatrix = fVector.transpose()*A.fMatrix;
-    //cerr << result.fMatrix;
-    result.fRows = result.fMatrix.rows();
-    result.fColumns = result.fMatrix.cols();
+    MyMatrix result;
+    result.fRows = 1;
+    result.fColumns = A.fColumns;
+
+    assert(fN == A.fRows);
+
+
+
+    if (A.fRows >= GPU_THRESHOLD || fN >= GPU_THRESHOLD 
+        || A.fColumns >= GPU_THRESHOLD)
+    {
+    //     cerr << "Before A:";
+    // cerr << fVector;
+    // cerr << A.fMatrix;
+    // cerr << "Expected: " <<fVector.transpose()*A.fMatrix;
+
+        // Create the raw array like represantion for the GPU
+        float* this_vector_gpu = (float*)malloc(1*fN*sizeof(float));
+        float* A_gpu = (float*)malloc(A.fRows*A.fColumns*sizeof(float));
+
+        for (int index = 0; index < fN; index++)
+            this_vector_gpu[index] = fVector(index);
+        for (int i = 0; i< A.fRows; i++)
+            for (int j = 0; j < A.fColumns; j++)
+            {
+                A_gpu[j*A.fRows+i] = A.fMatrix(i,j);
+            }
+
+
+        //Result from the GPU.
+        float* result_gpu = (float*)malloc(1*A.fColumns*sizeof(float));
+
+        matrixMul(1, fN, A.fRows, A.fColumns, 1, A.fColumns,
+                  this_vector_gpu, A_gpu, result_gpu);
+
+        result.fMatrix = MatrixXd(result.fRows, result.fColumns);
+        for (int i = 0; i < result.fRows; i++)
+            for (int j = 0; j < result.fColumns; j++)
+            {
+                result.fMatrix(i,j) = result_gpu[j*result.fColumns+i];
+            }
+    }
+    else 
+    {
+        result.fMatrix = fVector.transpose()*A.fMatrix;
+        //cerr << result.fMatrix;
+    }
+
     return result;
 }
 

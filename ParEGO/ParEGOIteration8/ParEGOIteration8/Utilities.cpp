@@ -11,10 +11,12 @@
 #include <stdlib.h>
 #include <vector>
 #include <utility>
+#include <algorithm>
 #include <iostream>
 
 #define RN rand()/(RAND_MAX+1.0)
 
+using namespace std;
 
 namespace Utilities
 {
@@ -72,7 +74,7 @@ namespace Utilities
         {
             sorted.push_back(std::make_pair(val[i], i));
         }
-        sort(sorted.begin(), sorted.end());
+        std::sort(sorted.begin(), sorted.end());
         
         for(int i=1;i<=num;i++)
             idx[i]=sorted[i-1].second;

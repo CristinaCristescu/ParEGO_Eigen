@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-//#include </usr/local/cuda-6.5/targzts/x86_64-linux/include/cublas.h>
+#include <cublas.h>
 
 #define index(i,j,ld) (((j)*(ld))+(i))
 

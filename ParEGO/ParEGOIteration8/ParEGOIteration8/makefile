@@ -1,13 +1,18 @@
 
 CC=g++
 LD=g++
-CFLAGS=-c -Wall -Wno-deprecated -O3 -finline-functions 
-INCLUDE=-I /Users/cristina/eigen/eigen-eigen-1306d75b4a21/Eigen
+CFLAGS=-c -g -Wno-deprecated -O3 -finline-functions 
+INCLUDE=-I /home/cristina/eigen/Eigen
+NVCC=nvcc
+NVCCFLAGS = -c -g -O3
 
-all: ParEGOIteration7
+all: ParEGOIteration8
 
-ParEGOIteration7: ParEGOIteration7.o Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o Matrix.o
-	$(LD) $(INCLUDE) ParEGOIteration7.o Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o Matrix.o -o ParEGOIteration7
+ParEGOIteration8:  Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o ParEGOIteration8.o Matrix.o Cuda_Utilities.o
+	$(LD) -L/usr/local/cuda-6.5/lib64 Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o ParEGOIteration8.o Matrix.o Cuda_Utilities.o -lcublas -lcudart -o ParEGOIteration8
+
+Cuda_Utilities.o: Cuda_Utilities.cpp
+	$(NVCC) $(INCLUDE) $(NVCCFLAGS) -c Cuda_Utilities.cpp -lcublas -lcudart
 
 Matrix.o: Matrix.cpp 
 	$(CC) $(INCLUDE) $(CFLAGS) -c Matrix.cpp
@@ -27,8 +32,8 @@ DACE.o: DACE.cpp
 GeneticAlgorithm.o: GeneticAlgorithm.cpp
 	$(CC) $(INCLUDE) $(CFLAGS) -c GeneticAlgorithm.cpp
 
-ParEGOIteration7.o: ParEGOIteration7.cpp
-	$(CC) $(INCLUDE) $(CFLAGS) -c ParEGOIteration7.cpp
+ParEGOIteration8.o: ParEGOIteration8.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -c ParEGOIteration8.cpp
 
 clean:
-	rm *o ParEGOIteration7
+	rm *o ParEGOIteration8

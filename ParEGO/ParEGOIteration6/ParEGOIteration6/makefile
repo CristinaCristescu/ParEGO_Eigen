@@ -11,25 +11,25 @@ ParEGOIteration6: ParEGOIteration6.o Utilities.o WeightVector.o SearchSpace.o DA
 	$(LD) -L/usr/local/cuda-6.5/lib64 -lcuda -lcudart ParEGOIteration6.o Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o Cuda_Utilities.o -lcublas -lcudart -o ParEGOIteration6
 
 Cuda_Utilities.o: Cuda_Utilities.cpp
-	$(NVCC) $(NVCCFLAGS) Cuda_Utilities.cpp -lcublas -lcudart
+	$(NVCC) -I /home/cristina/eigen/Eigen $(NVCCFLAGS) Cuda_Utilities.cpp -lcublas -lcudart
 
 Utilities.o: Utilities.cpp
-	$(CC) $(CCFLAGS) -c Utilities.cpp
+	$(CC) -I /home/cristina/eigen/Eigen $(CCFLAGS) -c Utilities.cpp
 
 WeightVector.o: WeightVector.cpp
-	$(CC) $(CFLAGS) -c WeightVector.cpp
+	$(CC) -I /home/cristina/eigen/Eigen $(CFLAGS) -c WeightVector.cpp
 
 SearchSpace.o: SearchSpace.cpp
-	$(CC) $(CFLAGS) -c SearchSpace.cpp
+	$(CC) -I /home/cristina/eigen/Eigen $(CFLAGS) -c SearchSpace.cpp
 
 DACE.o: DACE.cpp
-	$(CC) $(CFLAGS) -c DACE.cpp
+	$(CC) -I /home/cristina/eigen/Eigen $(CFLAGS) -c DACE.cpp
 
 GeneticAlgorithm.o: GeneticAlgorithm.cpp
-	$(CC) $(CFLAGS) -c GeneticAlgorithm.cpp
+	$(CC) -I /home/cristina/eigen/Eigen $(CFLAGS) -c GeneticAlgorithm.cpp
 
 ParEGOIteration6.o: ParEGOIteration6.cpp
-	$(CC) $(CFLAGS) -c ParEGOIteration6.cpp
+	$(CC) -I /home/cristina/eigen/Eigen $(CFLAGS) -c ParEGOIteration6.cpp
 
 
 
