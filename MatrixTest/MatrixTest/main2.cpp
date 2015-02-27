@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Bianca Cristina Cristescu. All rights reserved.
 //
 #include <iostream>
-#include </Users/cristina/developer/eigen/eigen-eigen-1306d75b4a21/Eigen/Dense>
+#include </Users/cristina/eigen/eigen-eigen-1306d75b4a21/Eigen/Dense>
 #include "Matrix.h"
 
 #define MATRIX_SIZE 500
@@ -62,6 +62,7 @@ int main()
    t1 = clock();
    for (int run = 0; run < 200; run++)
       resultMy = MyA*MyB;
+   
    t2 = clock();
    
    t3 = clock();

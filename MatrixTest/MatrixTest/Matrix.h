@@ -10,7 +10,7 @@
 #define __MatrixTest__Matrix__
 
 #include <stdio.h>
-#include </home/cristina/eigen/Eigen/Dense>
+#include </Users/cristina/eigen/eigen-eigen-1306d75b4a21/Eigen/Dense>
 
 using namespace std;
 using namespace Eigen;
@@ -21,8 +21,10 @@ private:
    size_t fM;
    MatrixXd fMatrix;
 public:
-   MyMatrix() : fM(0), fN(0) {}
+   MyMatrix() : fM(0), fN(0) { fMatrix = MatrixXd();}
    MyMatrix(size_t m, size_t n);
+   MyMatrix(MyMatrix& matrix);
+
    double operator()(size_t i, size_t j)
    {
       return fMatrix(i,j);

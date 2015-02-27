@@ -7,7 +7,7 @@
 //
 
 #include <iostream>
-#include </home/cristina/eigen/Eigen/Dense>
+#include </Users/cristina/eigen/eigen-eigen-1306d75b4a21/Dense>
 #define RN rand()/(RAND_MAX+1.0)
 #define HA 250
 #define WA 250

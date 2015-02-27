@@ -268,6 +268,11 @@
 		6BFFCE171A00270600357181 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/cristina/eigen/eigen-eigen-1306d75b4a21/",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -275,7 +280,11 @@
 		6BFFCE181A00270600357181 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				"HEADER_SEARCH_PATHS[arch=*]" = "/Users/cristina/developer/eigen/eigen-eigen-1306d75b4a21/";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/cristina/eigen/eigen-eigen-1306d75b4a21/",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"USER_HEADER_SEARCH_PATHS[arch=*]" = "/Users/cristina/developer/eigen/eigen-eigen-1306d75b4a21/";
 			};
@@ -320,6 +329,7 @@
 				6BFFCE181A00270600357181 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6BFFCE261A0037C700357181 /* Build configuration list for PBXNativeTarget "wrapper" */ = {
 			isa = XCConfigurationList;
@@ -328,6 +338,7 @@
 				6BFFCE281A0037C700357181 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
