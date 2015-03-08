@@ -238,11 +238,11 @@ int main(int argc, char **argv)
     srand(seed);
     
     
-    string filename = "vlmpo2-obj-it9-100-";
+    string filename = "kno1-obj-it9-250";
     
     plotfile = fopen((filename + ".dat").c_str(), "w");
     
-    string function = "f_vlmop2";
+    string function = "f_kno1";
     U.setspace(function.c_str());
     U.setweights();
     U.setDACE();
@@ -289,9 +289,9 @@ void universe::iterate_ParEGO()
     //fprintf(stdout,"\n ymin: %lg\n", model->ymin);
     //fprintf(stdout,"best_ever: %d\n", best_ever);
     //chose the solutions to use to update the DACE model
-    if(iter>11*space->fSearchSpaceDim+24)
+    if(iter>21*space->fSearchSpaceDim+24)
     {
-        model->fCorrelationSize = 11*space->fSearchSpaceDim+24;
+        model->fCorrelationSize = 21*space->fSearchSpaceDim+24;
 
         space->chooseUpdateSolutions(iter, model->fCorrelationSize);
         model->pax=&space->fSelectedXVectors;
