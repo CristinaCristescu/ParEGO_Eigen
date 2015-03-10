@@ -2,7 +2,7 @@
 CC=g++
 LD=g++
 CFLAGS=-c -g -Wno-deprecated -O3 -finline-functions 
-INCLUDE=-I /home/cristina/eigen/Eigen
+INCLUDE=-I /home/cristina/eigen/Eigen -I /home/cristina/NVIDIA_CUDA-6.5_Samples/common/inc
 NVCC=nvcc
 NVCCFLAGS = -c -g -O3
 
@@ -33,7 +33,8 @@ GeneticAlgorithm.o: GeneticAlgorithm.cpp
 	$(CC) $(INCLUDE) $(CFLAGS) -c GeneticAlgorithm.cpp
 
 ParEGOIteration8.o: ParEGOIteration8.cpp
-	$(CC) $(INCLUDE) $(CFLAGS) -c ParEGOIteration8.cpp
+	$(NVCC) $(INCLUDE) $(NVCCFLAGS) -c ParEGOIteration8.cpp -lcublas -lcudart
+
 
 clean:
 	rm *o ParEGOIteration8

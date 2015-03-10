@@ -505,6 +505,7 @@ double DACE::standard_density(double z)
 
 double  DACE::expected_improvement(double yhat, double ymin, double s)
 {
+
     double E;
     double sdis;
     double sden;
@@ -552,8 +553,9 @@ double DACE::wrap_ei(double *x, int iter)
     ss=s2(*pax);
     //fprintf(stderr,"s^2 error in wrap_ei() = %.4lg\n", ss);
     //fprintf(stderr,"%.9lf %.9lf \n", x[1], ss);
-    
-    
+    if(iter == 40)
+        fprintf(stderr,"%.9lf %.9lf \n", x[1], ss);
+    assert(ss >=0);
     // compute the expected improvement
     double ei;
     ei=expected_improvement(fit, gymin, sqrt(ss));
