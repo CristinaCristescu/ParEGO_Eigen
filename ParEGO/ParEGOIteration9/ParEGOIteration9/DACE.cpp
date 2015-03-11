@@ -12,7 +12,7 @@
 #define PI 3.141592653
 #define INFTY 1.0e35;
 #define RN rand()/(RAND_MAX+1.0)
-#define NMAX 100
+#define NMAX 200
 
 #include <iostream>
 #include <math.h>
@@ -357,7 +357,7 @@ void DACE::buildDACE(bool change, int iter)
     //Actually use NMAX of the sample points.
     fCorrelationSize=iter;
 
-    if (fCorrelationSize > 21*daceSpace->fSearchSpaceDim+24)
+    if (iter > NMAX)
     {
         int ind[iter+1];
         Utilities::mysort(ind, daceSpace->fMeasuredFit, fCorrelationSize);
@@ -368,15 +368,19 @@ void DACE::buildDACE(bool change, int iter)
                 daceSpace->fSelectedXVectors[i][d] = daceSpace->fXVectors[ind[i]][d];
                 //printf("%lg", fSelectedXVectors[i][d]);
             }
-            
+            //MIGHT AFFECT THE DACE MODEL CREATION WHICH USES fSelected as well
             daceSpace->fSelectedMeasuredFit[i] = daceSpace->fMeasuredFit[ind[i]];
             //fprintf(stdout," tmpay: %lg", daceSpace->fSelectedMeasuredFit[i]);
         }
-        fCorrelationSize = (fCorrelationSize > NMAX)? NMAX : fCorrelationSize;
+        pax = &daceSpace->fSelectedXVectors;
+        pay = &daceSpace->fSelectedMeasuredFit;
+        fCorrelationSize = NMAX;
     }
-    //fprintf(stdout, "\n");
+    else {//fprintf(stdout, "\n");
     
-    pax = &daceSpace->fXVectors;
+        pax = &daceSpace->fXVectors;
+        pgy = MyVector(fCorrelationSize, daceSpace->fMeasuredFit);
+    }
     
     //ME: Carefull with the indexes!!! It starts from 1.
     MyMatrix pgR(fCorrelationSize,fCorrelationSize);
@@ -386,7 +390,7 @@ void DACE::buildDACE(bool change, int iter)
     //printf("det = %lg\n",det);
     pInvR = pgR.inverse();
     //cout<<"MATRIX INV" <<InvR<<"\n";
-    pgy = MyVector(fCorrelationSize, daceSpace->fMeasuredFit);
+    
     /* ***************************** */
     
     //   fprintf(out,"predicted R matrix built OK:\n");
