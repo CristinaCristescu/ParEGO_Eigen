@@ -1,4 +1,4 @@
-MATPACK = /Users/cristina/projectDev/GitRepoParEGO/matpack
+MATPACK = /Users/cristina/projectDev/matpack
 LIBS = $(MATPACK)/matpack.a -lXpm -lX11 -lm -L/usr/X11R6/lib
 INCLUDE = -DXPM_INCLUDE="<X11/xpm.h>" -I$(MATPACK)/include
 

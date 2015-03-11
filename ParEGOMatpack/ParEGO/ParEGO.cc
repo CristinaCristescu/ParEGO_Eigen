@@ -168,7 +168,7 @@
 #define MatrixIndexRangeChecking
 #define ComplexVectorIndexRangeChecking
 #define ComplexMatrixIndexRangeChecking
-#include "/Users/cristina/projectDev/GitRepoParEGO/matpack/include/vector.h"
+#include "/Users/cristina/projectDev/matpack/include/vector.h"
 #include "nrutil.h"
 
 // numerical integration defines
@@ -193,7 +193,6 @@ public:
     int MAX_ITERS;
     char fitfunc[100];
     int iter; // global iteration counter
-    FILE* plotfile;
 
     
 private:
@@ -511,7 +510,7 @@ void universe::set_search()
      it in the same way as done below for f_vlmop2. Then search for "HERE" again.
      */
     
-    MAX_ITERS=250; // default value
+    MAX_ITERS=100; // default value
     
     if(strcmp(fitfunc,"f_vlmop2")==0) // fitness function name, as it will be given on command line
     {
@@ -1092,7 +1091,7 @@ double universe::wrap_ei(double *x)
     // return the expected improvement
     return(-ei);
 }
-
+FILE* plotfile;
 
 int main(int argc, char **argv)
 {
@@ -1102,16 +1101,27 @@ int main(int argc, char **argv)
     
     unsigned int seed = 47456536;
     printf("seed: %d\n", seed);
-//    if(argc>1)
-//        seed = atoi(argv[1]);
-    srand(seed);
     
-    sprintf(U.fitfunc, "f_oka2");
-    printf("function_name: %s\n", U.fitfunc);
+    sprintf(U.fitfunc, "f_vlmop2");
+    //printf("function_name: %s\n", U.fitfunc);
+    //printf("seed: %d\n", seed);
+        //    if(argc>1)
+        //        seed = atoi(argv[1]);
     if(argc>2)
         sprintf(U.fitfunc, argv[2]);
-    
-    U.plotfile = fopen("plotMatpack.txt", "w");
+
+    for (int index = 0; index < 20; index++)
+    {
+        char buf[100];
+        sprintf(buf, "%d", index);
+        char filename[200];
+        strcpy(filename, U.fitfunc);
+        strcat(filename, "-obj-matpack-100-");
+        strcat(filename, buf);
+        
+        plotfile = fopen(filename, "w");
+        
+        srand(seed+1000*index);
 
     U.init_ParEGO(); // starts up ParEGO and does the latin hypercube, outputting these to a file
     
@@ -1122,11 +1132,12 @@ int main(int argc, char **argv)
         U.iterate_ParEGO(); // takes n solution/point pairs as input and gives 1 new solution as output
         i++;
     }
-        fclose(U.plotfile);
+        fclose(plotfile);
      time2 = clock();
     float diff1 ((float)time2-(float)time1);
     float seconds1 = diff1 / CLOCKS_PER_SEC;
     cout<<seconds1<<endl;    
+}
 
 }
 
@@ -1311,9 +1322,8 @@ void universe::iterate_ParEGO()
                 mu_last=mu_hat(InvR, y, titer);
                 //	  fprintf(stdout,"OK - mu calculated\n");
                 sigma_last=sigma_squared_hat(InvR, y, mu_last, titer);
-                if(iter==80)
                  // fprintf(stdout,"OK - sigma calculated\n");
-                fprintf(stdout,"mu and sigma: %lg %lg\n", mu_last, sigma_last);
+                //fprintf(stdout,"mu and sigma: %lg %lg\n", mu_last, sigma_last);
                 
                 for(int j=1;j<=dim;j++)
                 {
@@ -1593,7 +1603,11 @@ void universe::init_ParEGO()
             fprintf(stdout, "decision\n");
             fprintf(stdout, "%d ", i+prior_it);
             for(int k=1;k<=nobjs;k++)
+            {
                 fprintf(stdout, "%lg ", ff[i][k]);
+                fprintf(plotfile, "%lg ", ff[i][k]);
+            }    
+            fprintf(plotfile, "\n");    
             fprintf(stdout,"objective\n");
         }
     }while(0);
@@ -1752,8 +1766,10 @@ double universe::s2(double **ax, double *theta, double *p, double sigma, int dim
          // fprintf(stdout,"r[i]=%lg ",r[i]);
     }
     // fprintf(stdout,"\n");
-    
-    s2 = sigma * (1.0 - r*InvR*r + pow((1-one*InvR*r),2)/(one*InvR*one) );
+    double intermediate = (1.0 - r*InvR*r + pow((1-one*InvR*r),2)/(one*InvR*one) );
+    if (intermediate < 0)
+        intermediate = myabs(intermediate);
+    s2 = sigma * intermediate;
 //    double aa = one*InvR*r;
 //    double a1 = 1-one*InvR*r;
 //    double f1 = pow((1-one*InvR*r),2)/(one*InvR*one);
