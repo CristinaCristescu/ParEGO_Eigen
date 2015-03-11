@@ -208,7 +208,6 @@ universe::universe(int x)
 {
     Debug=false;
     best_ever=1;
-    MAX_ITERS = 250;
 }
 
 void universe::setweights()
@@ -225,6 +224,7 @@ void universe::setDACE()
 {
     model = new DACE(space);
 }
+FILE* plotfile;
 
 int main(int argc, char **argv)
 {
@@ -235,13 +235,26 @@ int main(int argc, char **argv)
     
     unsigned int seed=47456536;
     srand(seed);
-    
+    U.MAX_ITERS = 250;
+
+   
     string function = "f_vlmop2";
+    if(argc>2)
+    {
+        function = string(argv[2]);
+        U.MAX_ITERS = atoi(argv[1]);
+    }
+    
+    fprintf(stderr, "%s\n", function.c_str());
+    string filename = function+ "-obj-it7-" + to_string(U.MAX_ITERS) ;
+    
+    plotfile = fopen((filename + ".dat").c_str(), "w");
+
+    
     U.setspace(function.c_str());
     U.setweights();
     U.setDACE();
-    //if(argc>2)
-    // sprintf(U.fitfunc, argv[2]);
+    
 
     U.init_ParEGO(); // starts up ParEGO and does the latin hypercube, outputting these to a file
     
@@ -334,9 +347,9 @@ void universe::iterate_ParEGO()
     for(int i=1;i<=space->fNoObjectives;i++)
     {
         printf( "%lg ", space->fCostVectors[iter+1][i]);
-        //fprintf(plotfile, "%.5lf ", ff[iter+1][i]);
+        fprintf(plotfile, "%lg ", space->fCostVectors[iter+1][i]);
     }
-    //fprintf(plotfile, "\n");
+    fprintf(plotfile, "\n");
     printf("objective\n");
     
     //cout<<"ymin"<<model->ymin<<"\n";
@@ -383,7 +396,12 @@ void universe::init_ParEGO()
             //printf("\n");
             printf("%d ", i+prior_it);
             for(int k=1;k<=space->fNoObjectives;k++)
+            {
                 printf("%lg ", space->fCostVectors[i][k]);
+                fprintf(plotfile, "%.9lg ", space->fCostVectors[i][k]);
+
+            }
+            fprintf(plotfile, "\n");
             printf("objective\n");
         }
     }while(0);

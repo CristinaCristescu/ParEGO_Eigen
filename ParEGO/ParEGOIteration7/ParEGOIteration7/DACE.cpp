@@ -123,9 +123,12 @@ double DACE::s2(double **ax)
         r.insert(i, correlation(ax[fCorrelationSize+1],ax[i+1],gtheta,gp,daceSpace->fSearchSpaceDim));
         //fprintf(stderr,"r[i]=%lg \n",r(i));
     }
-    
-    s2 = gsigma * (1- (r.transpose()*pInvR*r)(0,0) +
-                   pow((1-(one.transpose()*pInvR*r)(0,0)),2)/(one.transpose()*pInvR*one)(0,0));
+    double intermediate = (1- (r.transpose()*pInvR*r)(0,0) +
+                           pow((1-(one.transpose()*pInvR*r)(0,0)),2)/
+                           (one.transpose()*pInvR*one)(0,0));
+    if (intermediate < 0)
+        intermediate = myabs(intermediate);
+    s2 = gsigma * intermediate;
     return(s2);
 }
 
