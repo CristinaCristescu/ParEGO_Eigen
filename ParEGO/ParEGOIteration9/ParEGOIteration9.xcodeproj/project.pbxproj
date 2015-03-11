@@ -75,6 +75,7 @@
 		6B1223701AAB21B40087E12A /* ParEGOIteration9 */ = {
 			isa = PBXGroup;
 			children = (
+				6B1223821AAB21F70087E12A /* ParEGOIteration9.cpp */,
 				6B1223781AAB21F70087E12A /* DACE.h */,
 				6B1223791AAB21F70087E12A /* GeneticAlgorithm.h */,
 				6B12237A1AAB21F70087E12A /* Matrix.h */,
@@ -84,7 +85,6 @@
 				6B12237E1AAB21F70087E12A /* DACE.cpp */,
 				6B12237F1AAB21F70087E12A /* GeneticAlgorithm.cpp */,
 				6B1223801AAB21F70087E12A /* Matrix.cpp */,
-				6B1223821AAB21F70087E12A /* ParEGOIteration9.cpp */,
 				6B1223831AAB21F70087E12A /* SearchSpace.cpp */,
 				6B1223841AAB21F70087E12A /* Utilities.cpp */,
 				6B1223851AAB21F70087E12A /* WeightVector.cpp */,
@@ -278,6 +278,7 @@
 				6B1223771AAB21B40087E12A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
