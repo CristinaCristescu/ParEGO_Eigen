@@ -109,12 +109,10 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
              fprintf (stderr, "%d %d %d %d %d %d", HA, WA, HB, WB, HC, WC);*/
     //fprintf(stderr,"hihi\n");
     /*KERNEL*/
-    cudaDeviceSynchronize();
-    cudaThreadSynchronize();
 
     // setup execution parameters
-    //dim3 threads(block_size, block_size);
-    //dim3 grid(HC / threads.x, WC / threads.y);
+    dim3 threads(block_size, block_size);
+    dim3 grid(HC / threads.x, WC / threads.y);
 
     // CUBLAS version 2.0
     {
