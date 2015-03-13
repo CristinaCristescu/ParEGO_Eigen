@@ -73,7 +73,7 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
     time2 = clock();
     float diff1 =(float)time2-(float)time1;
     float seconds1 = diff1 / CLOCKS_PER_SEC;
-    //fprintf(stdout, "Allocation: %lg\n", seconds1);
+    fprintf(stdout, "Allocation: %lg\n", seconds1);
 
    /* cerr << "Matrix A:";
      for (int i=0;i<HA*WA;i++)
@@ -129,7 +129,7 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
         time2 = clock();
         diff1 = ((float)time2-(float)time1);
         float seconds1 = diff1 / CLOCKS_PER_SEC;
-        //fprintf(stdout, "Multiplication: %lg\n", seconds1);
+        fprintf(stdout, "Multiplication: %lg\n", seconds1);
 
         // copy result from device to host
         checkCudaErrors(cublasGetMatrix(HC,WC,sizeof(float),myCC,HC,C,HC));
