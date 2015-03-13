@@ -123,9 +123,15 @@ double DACE::s2(double **ax)
         r.insert(i, correlation(ax[fCorrelationSize+1],ax[i+1],gtheta,gp,daceSpace->fSearchSpaceDim));
         //fprintf(stderr,"r[i]=%lg \n",r(i));
     }
-    
-    s2 = gsigma * (1- (r.transpose()*pInvR*r)(0,0) +
+    double intermidiate = (1- (r.transpose()*pInvR*r)(0,0) +
                    pow((1-(one.transpose()*pInvR*r)(0,0)),2)/(one.transpose()*pInvR*one)(0,0));
+    if (intermidiate <= 0)
+        intermidiate = myabs(intermidiate);
+    assert (gsigma > 0);
+    //fprintf(stderr, "%lg\n", intermidiate);
+    assert (intermidiate > 0);
+    s2 = gsigma * intermidiate;
+    assert (s2 > 0);
     return(s2);
 }
 
@@ -553,9 +559,7 @@ double DACE::wrap_ei(double *x, int iter)
     ss=s2(*pax);
     //fprintf(stderr,"s^2 error in wrap_ei() = %.4lg\n", ss);
     //fprintf(stderr,"%.9lf %.9lf \n", x[1], ss);
-    if(iter == 40)
-        fprintf(stderr,"%.9lf %.9lf \n", x[1], ss);
-    assert(ss >=0);
+    
     // compute the expected improvement
     double ei;
     ei=expected_improvement(fit, gymin, sqrt(ss));

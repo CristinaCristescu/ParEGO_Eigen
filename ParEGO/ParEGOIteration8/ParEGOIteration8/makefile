@@ -8,8 +8,8 @@ NVCCFLAGS = -c -g -O3
 
 all: ParEGOIteration8
 
-ParEGOIteration8:  Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o ParEGOIteration8.o Matrix.o Cuda_Utilities.o
-	$(LD) -L/usr/local/cuda-6.5/lib64 Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o ParEGOIteration8.o Matrix.o Cuda_Utilities.o -lcublas -lcudart -o ParEGOIteration8
+ParEGOIteration8:  Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o Cuda_Utilities.o ParEGOIteration8.o Matrix.o 
+	$(LD) -L/usr/local/cuda-6.5/lib64 Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o Cuda_Utilities.o ParEGOIteration8.o Matrix.o  -lcublas -lcudart -o ParEGOIteration8
 
 Cuda_Utilities.o: Cuda_Utilities.cpp
 	$(NVCC) $(INCLUDE) $(NVCCFLAGS) -c Cuda_Utilities.cpp -lcublas -lcudart

@@ -172,6 +172,7 @@
 #include "DACE.h"
 #include "GeneticAlgorithm.h"
 #include "Utilities.cpp"
+#include "Cuda_Utilities.h"
 
 using namespace std;
 using namespace Eigen;
@@ -209,7 +210,7 @@ universe::universe(int x)
 {
     Debug=false;
     best_ever=1;
-    MAX_ITERS = 70;
+    MAX_ITERS = 250;
 }
 
 void universe::setweights()
@@ -250,7 +251,7 @@ void initializeCUDA(int &devID)
         printf("cudaGetDevice returned error code %d, line(%d)\n", error, __LINE__);
         exit(EXIT_FAILURE);
     }
-        printf("AAAAAAAAAAAAA");
+        //printf("AAAAAAAAAAAAA");
 
     
     cudaDeviceProp deviceProp;
@@ -271,7 +272,7 @@ int main(int argc, char **argv)
 {
     clock_t time1, time2;
     time1 = clock();
-
+    
     universe U(1);
     
     unsigned int seed=47456536;
@@ -288,6 +289,7 @@ int main(int argc, char **argv)
     
     int devID = 0;
     initializeCUDA(devID);
+    
     
     int i = U.iter;
     while ( i < U.MAX_ITERS )
@@ -308,7 +310,9 @@ int main(int argc, char **argv)
     // needed to ensure correct operation when the application is being
     // profiled. Calling cudaDeviceReset causes all profile data to be
     // flushed before the application exits
+   
     cudaDeviceReset();
+
 
 }
 
@@ -317,7 +321,8 @@ void universe::iterate_ParEGO()
     
     int prior_it=0;
     int stopcounter=0;
-    
+
+
     weights->changeWeights(iter, space->fWeightVectors);
     //fprintf(stderr, "%.2lf %.2lf weightvectors \n", space->fWeightVectors[0], space->fWeightVectors[1]);
     //fprintf(stderr, "fMEasureFIt\n");
@@ -349,6 +354,7 @@ void universe::iterate_ParEGO()
         model->pay=&space->fMeasuredFit;
     }
     
+    myalloc(iter);
     model->buildDACE(weights->change, iter);
     
     start = clock();
@@ -411,6 +417,7 @@ void universe::iterate_ParEGO()
     }
     
     iter++;
+    mydealloc();
     
    }
 

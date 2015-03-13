@@ -21,6 +21,27 @@ using namespace std;
 
 namespace Cuda_Utilities
 {
+}
+
+float* myAA; float* myBB; float* myCC;
+
+void myalloc(int iter)
+{
+    /*ALLOCATE ON THE DEVICE*/
+    /*ALLOCATE ON THE DEVICE*/
+    checkCudaErrors(cublasAlloc(iter*iter,sizeof(float),(void**)&myAA));
+    checkCudaErrors(cublasAlloc(iter*iter,sizeof(float),(void**)&myBB));
+    checkCudaErrors(cublasAlloc(iter*iter,sizeof(float),(void**)&myCC));
+
+}
+
+void mydealloc()
+{
+    
+    checkCudaErrors(cudaFree(myAA));
+    checkCudaErrors(cudaFree(myBB));
+    checkCudaErrors(cudaFree(myCC));
+   
 
 }
 
@@ -28,6 +49,9 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
                           float* A, float* B, float* C)
 {
     
+    clock_t time1, time2, start, end;
+    start = clock();
+
     cublasStatus status;
 
     cudaDeviceProp deviceProp;
@@ -36,16 +60,21 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
 
     // use a larger block size for Fermi and above
     int block_size = (deviceProp.major < 2) ? 16 : 32;
-    block_size = 8;
     //cerr << "block: " << block_size << "\n";
 
-    float* AA; float* BB; float* CC;
-    /*ALLOCATE ON THE DEVICE*/
-    checkCudaErrors(cudaMalloc((void **) &AA, HA*WA*sizeof(float)));
-    checkCudaErrors(cudaMalloc((void **) &BB, HB*WB*sizeof(float)));
-    checkCudaErrors(cudaMemcpy(AA, A, HA*WA*sizeof(float), cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(BB, B, HB*WB*sizeof(float), cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMalloc((void **) &CC, HC*WC*sizeof(float)));
+    
+   
+    
+    time1 = clock();
+    
+    cublasSetMatrix(HA,WA,sizeof(float),A,HA,myAA,HA);
+    cublasSetMatrix(HB,WB,sizeof(float),B,HB,myBB,HB);
+    
+    time2 = clock();
+    float diff1 =(float)time2-(float)time1;
+    float seconds1 = diff1 / CLOCKS_PER_SEC;
+    //fprintf(stdout, "Allocation: %lg\n", seconds1);
+
    /* cerr << "Matrix A:";
      for (int i=0;i<HA*WA;i++)
         fprintf(stderr, "%lg ", A[i]);
@@ -56,8 +85,8 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
      fprintf(stderr,"\n");
 
      float* checkA = (float*)malloc(HA*WA*sizeof(float));
-     cublasGetMatrix(HA,WA,sizeof(float),AA,HA,checkA,HA);
-    if (status != CUBLAS_STATUS_SUCCESS) 
+     cublasGetMatrix(HA,WA,sizeof(float),myAA,HA,checkA,HA);
+    if (status != CUBLAS_STATUS_SUmyCCESS) 
     {
         fprintf (stderr, "!!!! device read error (A)\n");
     }
@@ -67,8 +96,8 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
         fprintf(stderr, "\n");
 
         float* checkB = (float*)malloc(HB*WB*sizeof(float));
-     cublasGetMatrix(HB,WB,sizeof(float),BB,HB,checkB,HB);
-    if (status != CUBLAS_STATUS_SUCCESS) 
+     cublasGetMatrix(HB,WB,sizeof(float),myBB,HB,checkB,HB);
+    if (status != CUBLAS_STATUS_SUmyCCESS) 
     {
         fprintf (stderr, "!!!! device read error (A)\n");
     }
@@ -84,8 +113,8 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
     cudaThreadSynchronize();
 
     // setup execution parameters
-    dim3 threads(block_size, block_size);
-    dim3 grid(HC / threads.x, WC / threads.y);
+    //dim3 threads(block_size, block_size);
+    //dim3 grid(HC / threads.x, WC / threads.y);
 
     // CUBLAS version 2.0
     {
@@ -95,12 +124,17 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
 
         checkCudaErrors(cublasCreate(&handle));
 
-    
+         time1 = clock();
 
-        checkCudaErrors(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, HA,WB,WA, &alpha, AA, HA, BB, HB, &beta, CC, HC));
+        checkCudaErrors(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, HA,WB,WA, &alpha, myAA, HA, myBB, HB, &beta, myCC, HC));
+
+        time2 = clock();
+        diff1 = ((float)time2-(float)time1);
+        float seconds1 = diff1 / CLOCKS_PER_SEC;
+        //fprintf(stdout, "Multiplication: %lg\n", seconds1);
 
         // copy result from device to host
-        checkCudaErrors(cudaMemcpy(C, CC, HC*WC*sizeof(float), cudaMemcpyDeviceToHost));
+        checkCudaErrors(cublasGetMatrix(HC,WC,sizeof(float),myCC,HC,C,HC));
 
         // Destroy the handle
         checkCudaErrors(cublasDestroy(handle));
@@ -112,10 +146,13 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
     //     fprintf(stderr, "%lg ", C[i]);
     //     fprintf(stderr,"\n");
 
-    checkCudaErrors(cudaFree(AA));
-    checkCudaErrors(cudaFree(BB));
-    checkCudaErrors(cudaFree(CC));
+    
         /* Shutdown */
-
+    end = clock();
+    diff1 = ((float)time2-(float)time1);
+    seconds1 = diff1 / CLOCKS_PER_SEC;
+        //fprintf(stdout, "Overall: %lg\n", seconds1);
+    
 
 }
+
