@@ -16,7 +16,7 @@
 
 #define Debug_Matrix = false
 #define GPU true
-#define GPU_THRESHOLD 70
+#define GPU_THRESHOLD 500
 #define GPU_EXISTS
 
 MyMatrix::MyMatrix(size_t m, size_t n)
