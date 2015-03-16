@@ -3,7 +3,8 @@
 #include <iostream>
 #include <assert.h>
 #include <cublas.h>
-#include <helper_string.h>  // helper for shared functions common to CUDA Samples
+// helper for shared functions common to CUDA Samples
+#include <helper_string.h>  
 // CUDA and CUBLAS functions
 #include <helper_functions.h>
 #include <helper_cuda.h>
@@ -19,30 +20,21 @@ using namespace std;
 
 #include "Cuda_Utilities.h"
 
-namespace Cuda_Utilities
-{
-}
-
 float* myAA; float* myBB; float* myCC;
 
 void myalloc(int iter)
 {
     /*ALLOCATE ON THE DEVICE*/
-    /*ALLOCATE ON THE DEVICE*/
     checkCudaErrors(cublasAlloc(iter*iter,sizeof(float),(void**)&myAA));
     checkCudaErrors(cublasAlloc(iter*iter,sizeof(float),(void**)&myBB));
     checkCudaErrors(cublasAlloc(iter*iter,sizeof(float),(void**)&myCC));
-
 }
 
 void mydealloc()
 {
-    
     checkCudaErrors(cudaFree(myAA));
     checkCudaErrors(cudaFree(myBB));
     checkCudaErrors(cudaFree(myCC));
-   
-
 }
 
 extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
@@ -62,9 +54,6 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
     int block_size = (deviceProp.major < 2) ? 16 : 32;
     //cerr << "block: " << block_size << "\n";
 
-    
-   
-    
     time1 = clock();
     
     cublasSetMatrix(HA,WA,sizeof(float),A,HA,myAA,HA);
@@ -129,7 +118,8 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
         time2 = clock();
         diff1 = ((float)time2-(float)time1);
         float seconds1 = diff1 / CLOCKS_PER_SEC;
-        fprintf(stdout, "Multiplication: %lg\n", seconds1);
+        if(Debug)
+          fprintf(stdout, "Multiplication: %lg\n", seconds1);
 
         // copy result from device to host
         checkCudaErrors(cublasGetMatrix(HC,WC,sizeof(float),myCC,HC,C,HC));
@@ -138,13 +128,6 @@ extern "C" void matrixMul(int HA, int WA, int HB, int WB, int HC, int WC,
         checkCudaErrors(cublasDestroy(handle));
     }
 
-    
-    // cerr << "Matrix C:";
-    // for (int i=0;i<HC*WC;i++)
-    //     fprintf(stderr, "%lg ", C[i]);
-    //     fprintf(stderr,"\n");
-
-    
         /* Shutdown */
     end = clock();
     diff1 = ((float)time2-(float)time1);
