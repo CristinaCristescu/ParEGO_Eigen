@@ -10,10 +10,10 @@
 		6B1BE0191AB4B356006D1DA4 /* DACE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE00B1AB4B356006D1DA4 /* DACE.cpp */; };
 		6B1BE01A1AB4B356006D1DA4 /* GeneticAlgorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE00D1AB4B356006D1DA4 /* GeneticAlgorithm.cpp */; };
 		6B1BE01B1AB4B356006D1DA4 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE00F1AB4B356006D1DA4 /* Matrix.cpp */; };
-		6B1BE01D1AB4B356006D1DA4 /* ParEGOIteration12.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE0121AB4B356006D1DA4 /* ParEGOIteration12.cpp */; };
 		6B1BE01E1AB4B356006D1DA4 /* SearchSpace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE0131AB4B356006D1DA4 /* SearchSpace.cpp */; };
 		6B1BE01F1AB4B356006D1DA4 /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE0151AB4B356006D1DA4 /* Utilities.cpp */; };
 		6B1BE0201AB4B356006D1DA4 /* WeightVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE0171AB4B356006D1DA4 /* WeightVector.cpp */; };
+		6B1BE0221AB4F230006D1DA4 /* ParEGOIteration13.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6B1BE0211AB4F230006D1DA4 /* ParEGOIteration13.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -36,13 +36,13 @@
 		6B1BE00E1AB4B356006D1DA4 /* GeneticAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeneticAlgorithm.h; sourceTree = "<group>"; };
 		6B1BE00F1AB4B356006D1DA4 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix.cpp; sourceTree = "<group>"; };
 		6B1BE0101AB4B356006D1DA4 /* Matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Matrix.h; sourceTree = "<group>"; };
-		6B1BE0121AB4B356006D1DA4 /* ParEGOIteration12.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParEGOIteration12.cpp; sourceTree = "<group>"; };
 		6B1BE0131AB4B356006D1DA4 /* SearchSpace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SearchSpace.cpp; sourceTree = "<group>"; };
 		6B1BE0141AB4B356006D1DA4 /* SearchSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchSpace.h; sourceTree = "<group>"; };
 		6B1BE0151AB4B356006D1DA4 /* Utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utilities.cpp; sourceTree = "<group>"; };
 		6B1BE0161AB4B356006D1DA4 /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
 		6B1BE0171AB4B356006D1DA4 /* WeightVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WeightVector.cpp; sourceTree = "<group>"; };
 		6B1BE0181AB4B356006D1DA4 /* WeightVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeightVector.h; sourceTree = "<group>"; };
+		6B1BE0211AB4F230006D1DA4 /* ParEGOIteration13.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ParEGOIteration13.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,19 +75,19 @@
 		6B1BE0031AB4B313006D1DA4 /* ParEGOIteration13 */ = {
 			isa = PBXGroup;
 			children = (
-				6B1BE00B1AB4B356006D1DA4 /* DACE.cpp */,
-				6B1BE00C1AB4B356006D1DA4 /* DACE.h */,
-				6B1BE00D1AB4B356006D1DA4 /* GeneticAlgorithm.cpp */,
-				6B1BE00E1AB4B356006D1DA4 /* GeneticAlgorithm.h */,
+				6B1BE0211AB4F230006D1DA4 /* ParEGOIteration13.cpp */,
 				6B1BE00F1AB4B356006D1DA4 /* Matrix.cpp */,
 				6B1BE0101AB4B356006D1DA4 /* Matrix.h */,
-				6B1BE0121AB4B356006D1DA4 /* ParEGOIteration12.cpp */,
+				6B1BE0161AB4B356006D1DA4 /* Vector.h */,
+				6B1BE00B1AB4B356006D1DA4 /* DACE.cpp */,
+				6B1BE00C1AB4B356006D1DA4 /* DACE.h */,
 				6B1BE0131AB4B356006D1DA4 /* SearchSpace.cpp */,
 				6B1BE0141AB4B356006D1DA4 /* SearchSpace.h */,
-				6B1BE0151AB4B356006D1DA4 /* Utilities.cpp */,
-				6B1BE0161AB4B356006D1DA4 /* Vector.h */,
+				6B1BE00D1AB4B356006D1DA4 /* GeneticAlgorithm.cpp */,
+				6B1BE00E1AB4B356006D1DA4 /* GeneticAlgorithm.h */,
 				6B1BE0171AB4B356006D1DA4 /* WeightVector.cpp */,
 				6B1BE0181AB4B356006D1DA4 /* WeightVector.h */,
+				6B1BE0151AB4B356006D1DA4 /* Utilities.cpp */,
 			);
 			path = ParEGOIteration13;
 			sourceTree = "<group>";
@@ -152,9 +152,9 @@
 				6B1BE0191AB4B356006D1DA4 /* DACE.cpp in Sources */,
 				6B1BE01F1AB4B356006D1DA4 /* Utilities.cpp in Sources */,
 				6B1BE01A1AB4B356006D1DA4 /* GeneticAlgorithm.cpp in Sources */,
-				6B1BE01D1AB4B356006D1DA4 /* ParEGOIteration12.cpp in Sources */,
 				6B1BE01E1AB4B356006D1DA4 /* SearchSpace.cpp in Sources */,
 				6B1BE0201AB4B356006D1DA4 /* WeightVector.cpp in Sources */,
+				6B1BE0221AB4F230006D1DA4 /* ParEGOIteration13.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
