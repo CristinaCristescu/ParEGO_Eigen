@@ -1,32 +1,45 @@
-//
-//  WeightVector.h
-//  ParEGOIteration4
-//
-//  Created by Bianca Cristina Cristescu on 04/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class WeightVector
+ *
+ *
+ * \brief Representation of weight for scalarizinf multiple dimension solutions.
+ *
+ * This class models the weighting system that enables use to scalarize 
+ * a multi-dimensional solution to be used in the optimization problem to create
+ * a surrogate model function for the real expensive function.
+ *
+ * \note Copyright (c) 2006 Joshua Knowles. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 04/02/15.
+ *
+ */
 
-#ifndef __ParEGOIteration4__WeightVector__
-#define __ParEGOIteration4__WeightVector__
+#ifndef __ParEGOIteration13__WeightVector__
+#define __ParEGOIteration13__WeightVector__
 
-#define MAX_K 5
-
-#include <stdio.h>
+#include <vector>
 
 class WeightVector
 {
-public:
-    int N; // parameter relating to the number of divisions
-    int wv[40402][MAX_K];      // first dimension needs to be #weight vectors^nobjs
-    double normwv[300][MAX_K]; // first dimension needs to be N+k-1 choose k-1 ($^{N+k-1}C_{k-1}$) , where N is a parameter and k=nobjs
-    int fobjectives;
-    int next;
-    int add;
-    bool change;
+private:
+    int N; ///< parameter - number of divisions
+    std::vector<std::vector<int> > wv; ///< Weights vector. 
+    std::vector<std::vector<double> > normwv; ///< Normalized weights.
+    int wvSize; ///< Size of weight vectors.
+    int fobjectives; ///< Number of objectives for function.
+    int next; ///< Next iteration.
+    int add; ///< Add/decrease the weights.
+    bool change; ///< Change weights or not.
     
-    WeightVector();
-    WeightVector(int noobjectives);
-    void changeWeights(int iter, double* newvector);
+public:
+    WeightVector(int objectivesNumber);
+    void changeWeights(int iter, std::vector<double>& newvector);
+    
+private:
     void snake_wv();
     void reverse(int n);
 

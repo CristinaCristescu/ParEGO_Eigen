@@ -1,13 +1,23 @@
-//
-//  Matrix.h
-//  ParEGOIteration6
-//
-//  Created by Bianca Cristina Cristescu on 24/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class MyMatrix
+ *
+ *
+ * \brief The class is a wrapper around a matrix object.
+ *
+ * This class enables the code to be flexibles and maintanable.
+ *
+ * \note Copyright (c) 2015 Bianca-Cristina Cristescu. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 25/01/15.
+ *
+ */
 
-#ifndef __ParEGOIteration6__Matrix__
-#define __ParEGOIteration6__Matrix__
+#ifndef __ParEGOIteration13__Matrix__
+#define __ParEGOIteration13__Matrix__
 
 #include <stdio.h>
 #include <Dense>
@@ -19,23 +29,18 @@ class MyVector;
 
 class MyMatrix {
     
-    friend class MyVector;
+friend class MyVector;
     
 private:
-    size_t fRows;
-    size_t fColumns;
-    MatrixXd fMatrix;
+    size_t fRows; ///< Number of rows in the matrix.
+    size_t fColumns; ///< Number of columns in the matrix.
+    MatrixXd fMatrix; ///< The container for the matrix.
 public:
     MyMatrix() : fRows(0), fColumns(0) { fMatrix = MatrixXd(); }
     MyMatrix(size_t m, size_t n);
     MyMatrix(const MyMatrix& matrix);
     MyMatrix& operator=(const MyMatrix& A);
     ~MyMatrix();
-    //TO DO: Move Constructor
-    //TO DO: Move assignement
-    
-    //TO DO : Equality
-    //TO DO : Non-equality
     
     double operator()(size_t i, size_t j)
     {
@@ -62,5 +67,5 @@ public:
 
 
 
-#endif /* defined(__ParEGOIteration6__Matrix__) */
+#endif /* defined(__ParEGOIteration13__Matrix__) */
 

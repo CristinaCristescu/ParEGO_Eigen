@@ -1,40 +1,43 @@
-//
-//  Vector.h
-//  ParEGOIteration7
-//
-//  Created by Bianca Cristina Cristescu on 25/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class MyVector
+ *
+ *
+ * \brief The class is a wrapper around the vector class.
+ *
+ * This class enables the code to be flexibles and maintanable.
+ *
+ * \note Copyright (c) 2015 Bianca-Cristina Cristescu. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 25/01/15.
+ *
+ */
 
-#ifndef ParEGOIteration7_Vector_h
-#define ParEGOIteration7_Vector_h
+#ifndef ParEGOIteration13_Vector_h
+#define ParEGOIteration13_Vector_h
 
-#include <stdio.h>
+#include <vector>
 #include <Dense>
 
-using namespace std;
 using namespace Eigen;
 
 class MyVector {
     
-    friend class MyMatrix;
+friend class MyMatrix;
 
 private:
-    size_t fN;
-    VectorXd fVector;
+    size_t fN; ///< Size of the vector.
+    VectorXd fVector; ///< Container for the vector.
 public:
     MyVector() : fN(0) {}
     MyVector(size_t n);
     MyVector(size_t n, double init_value);
-    MyVector(size_t n, double* vector);
+    MyVector(size_t n, std::vector<double> vector);
     MyVector(const MyVector& V);
     MyVector& operator=(const MyVector& A);
-    
-    //TO DO: Move Constructor
-    //TO DO: Move assignement
-    
-    //TO DO : Equality
-    //TO DO : Non-equality
 
     double operator()(size_t i)
     {

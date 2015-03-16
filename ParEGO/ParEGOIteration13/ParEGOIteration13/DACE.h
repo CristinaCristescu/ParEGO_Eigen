@@ -1,72 +1,90 @@
-//
-//  DACE.h
-//  ParEGOIteration4
-//
-//  Created by Bianca Cristina Cristescu on 05/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class DACE
+ *
+ *
+ * \brief The class represents the DACE model of an optimization function.
+ *
+ * This class builds the function model for the optimization function
+ * and sets all the hyperparameters and provides the routines for evaluting a 
+ * sample points using the estimated function.
+ *
+ *
+ * \note Copyright (c) 2006 Joshua Knowles. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 05/02/15.
+ *
+ */
 
-#ifndef __ParEGOIteration4__DACE__
-#define __ParEGOIteration4__DACE__
+#ifndef __ParEGOIteration13__DACE__
+#define __ParEGOIteration13__DACE__
 
-#include <stdio.h>
 #include <vector>
-
-#include "SearchSpace.h"
 #include "Matrix.h"
 #include "Vector.h"
+
+class SearchSpace;
+class MyMatrix;
+class MyVector;
 
 class DACE
 {
 private:
-    SearchSpace* daceSpace;
-    int fNoParamDACE; // number of parameters in the DACE model pdim
-    double gmu;
-    double gsigma;
-    double *gtheta;
-    double *gp;
-    double gymin;
+    SearchSpace* daceSpace; ///< The function space characteristics.
+    int fCorrelationSize; ///< Size of the current correlation matrix.
+    int fNoParamDACE; ///< Number of parameters in the DACE model
+    double gmu; ///< Accroding to literature, global mean.
+    double gsigma; ///< According to literature, global standard deviation.
+    std::vector<double> gtheta; ///< According to literature, activity parameter.
+    std::vector<double> gp; ///< According to literature, smoothness parameter.
     //TO DO: Pointer or objects?
-    MyMatrix pInvR;
-    MyVector pgy;
-    double glik;
-    double gz[76]; // an array holding the z values for the gaussian distribution
+    MyMatrix pInvR; ///< Inverse of the correlation matrix.
+    MyVector pgy; ///< Vector fo the predicted y values.
+    double glik; ///< Global likelyhood.
+    double gz[76]; ///< Array holding the z values for the gaussian distribution
+    double gymin; ///< Global minimum predicted estimation y.
+    
+    // Constants to spped up the linear algebra operations for the function
+    // repeated function evaluations.
     MyMatrix one_pInvR;
     MyMatrix onetransp_pInvR;
     double onetransp_pInvR_one;
     MyVector predict_y_constant;
     
-
 public:
-    int fCorrelationSize; // global giving the size of the current correlation matrix R
-    // being used titer
-    //take them outttttt
-    double ***pax; // a pointer 
-    double **pay;
-    double ymin;
-    int debug_iter;
+    double ymin; ///< Global minimum predicted estimation y.
 
     DACE(SearchSpace* space);
-    ~DACE();
-    void buildDACE(bool change, int iter);
-    double wrap_ei(double *x, int iter); // returns -(expected improvement), given the solution x
+    void buildDACE(int iter);
+    double wrap_ei(double *x, int iter);
     
 private:
-    double correlation(double *xi, double *xj, double *theta, double *p, int dim);
+    double weighted_distance(const std::vector<double>& xi,
+                             const std::vector<double>& xj);
+    double correlation(const std::vector<double>& xi,
+                       const std::vector<double>& xj,
+                       const std::vector<double>& theta,
+                       const std::vector<double>& p,
+                       int dim);
     double mu_hat(MyVector& y, int iter);
     double sigma_squared_hat(MyVector& y);
-    double weighted_distance(double *xi, double *xj);
-    double predict_y(double **ax);
-    double s2(double **ax);
-    void build_R(double **ax,MyMatrix& R);
-    void build_y(double *ay, MyMatrix& y);
-    long double posdet(MyMatrix& R, int n);
+    
+    double predict_y(const std::vector<std::vector<double> >& solutionVector);
+    double s2(const std::vector<std::vector<double> >& solutionVector);
+    void build_R(const std::vector<std::vector<double> >& solutionVector,
+                 MyMatrix& R);
+    double posdet(MyMatrix& R, int n);
     void init_gz();
     double standard_density(double z);
     double standard_distribution(double z);
     double expected_improvement(double yhat, double ymin, double s);
-    double likelihood(double *param, double** pax, double* pay);
+    double likelihood(const std::vector<double>& param,
+                      const std::vector<std::vector<double> >& solutionVectors,
+                      const std::vector<double>& measuredFit);
     
 };
 
-#endif /* defined(__ParEGOIteration4__DACE__) */
+#endif /* defined(__ParEGOIteration13__DACE__) */

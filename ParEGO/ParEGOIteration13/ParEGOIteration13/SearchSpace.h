@@ -1,71 +1,76 @@
-//
-//  SearchSpace.h
-//  ParEGOIteration4
-//
-//  Created by Bianca Cristina Cristescu on 03/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class SearchSpace
+ *
+ * \brief Class that describes the search space of the function to be optimized.
+ *
+ * This class contains all the necessary information about the function to be
+ * optimised such as solutions, costs, minimum and maximum values of the
+ * function and the fitness evaluation.
+ *
+ * \note Copyright (c) 2006 Joshua Knowles. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 03/02/15.
+ *
+ */
+
 
 #ifndef __ParEGOIteration4__SearchSpace__
 #define __ParEGOIteration4__SearchSpace__
 
 #define MAX_K 5
 
-#include <stdio.h>
+#include <vector>
 
 class DACE;
 
-// The class models the search space and sets the fitness function.
 class SearchSpace
 {
 //change to private and make setters and getters
 private:
-    const char* fObjectiveFunctionName; // name of the objective function
+    const char* fObjectiveFunctionName; ///< Name of the objective function.
+    int fNoObjectives; ///< The number of objectivesS.
+    int fSearchSpaceDim; ///< Dimension of the actual search space.
+    std::vector<double> fAbsMax;
+    ///<absolute values of the maximum and of each objective space dimension
+    std::vector<double> fAbsMin;
+    ///<absolute values of the minimum and of each objective space dimension
+    std::vector<double> fIdealObjective; ///< Objective ideal points.
+    double alph; ///< Power in the DTLZ2 and DTLZ4 test functions.
 
 public:
-    
-    int fNoObjectives; //the number of objectives nobjs
-    int fSearchSpaceDim;  // dimension of the actual search space, X dim
-    double **fCostVectors; // two-dimensional array of all multiobjective cost vectors ff
-    double **fXVectors;  // two-dimensional array of all x vectors ax
-    double **fSelectedXVectors; // two dimensional array of selected x vectors tmpax
-    double *fXMin; // upper and lower constraints on the search space
-    double *fXMax;
-    double *fMeasuredFit; // array of true/measured y fitnesses ay
-    double *fSelectedMeasuredFit;
-    
-    double fAbsMax[MAX_K]; //absolute values of the maximum and minimum of each
-                          //objective space dimension
-    double fAbsMin[MAX_K];
-    double fIdealObjective[MAX_K]; //objective ideal points
-    double fWeightVectors[MAX_K]; //weight vectors
-        
-    double alph; // power in the DTLZ2 and DTLZ4 test functions
-
+    std::vector<double> fXMin; ///< Upper constraints on the search space.
+    std::vector<double> fXMax; ///< Lower constraints on the search space.
+    std::vector<std::vector<double> > fXVectors;
+    ///< Two-dimensional vector of all solution vectors.
+    std::vector<std::vector<double> > fSelectedXVectors;
+    ///< Two dimensional vector of selected solutions vectors for hyperparameter
+    std::vector<std::vector<double> > fCostVectors;
+    ///< Two-dimensional vector of all multiobjective cost vectors.
+    std::vector<double> fSelectedMeasuredFit; ///< Vector selected y fitnesses.
+    std::vector<double> fMeasuredFit; ///< Vector of true/measured y fitnesses.
+    std::vector<double> fWeightVectors; ///< Weight vectors.
 
 public:
-    SearchSpace();
     SearchSpace(const char* function_name, int max_iter);
-    void SetSearch();
-    void init_arrays(int n);
-    void applyFit(int i, int j);
-    void chooseUpdateSolutions(int iter, int correlation_size);
-    double Tcheby(double* vec);
-    double myfit(int i, int j);
+    void chooseAndUpdateSolutions(int iter, int correlation_size);
+    double fit(int iterationNo);
+    int getNoObjectives() { return fNoObjectives; }
+    int getSearchSpaceDimensions() { return fSearchSpaceDim; }
+    double tcheby(const std::vector<double>& vec);
     
 private:
-
-    void f_dtlz1a(double *x, double *y);
-    void f_dtlz2a(double *x, double *y);
-    void f_dtlz7a(double *x, double *y);
-    void f_vlmop3(double *x, double *y);
-    void f_oka1(double *x, double *y);
-    void f_oka2(double *x, double *y);
-    void f_vlmop2(double *x, double *y);
-    void f_kno1(double *x, double *y);
-    
-    
-    
+    void setSearch();
+    void f_dtlz1a(const std::vector<double>& x, std::vector<double>& y);
+    void f_dtlz2a(const std::vector<double>& x, std::vector<double>& y);
+    void f_dtlz7a(const std::vector<double>& x, std::vector<double>& y);
+    void f_vlmop3(const std::vector<double>& x, std::vector<double>& y);
+    void f_oka1(const std::vector<double>& x, std::vector<double>& y);
+    void f_oka2(const std::vector<double>& x, std::vector<double>& y);
+    void f_vlmop2(const std::vector<double>& x, std::vector<double>& y);
+    void f_kno1(const std::vector<double>& x, std::vector<double>& y);
 };
-
 #endif /* defined(__ParEGOIteration4__SearchSpace__) */
