@@ -84,7 +84,7 @@ const MyMatrix MyMatrix::operator*(const MyMatrix& A) const
         matrixMul(fRows, fColumns, A.fRows, A.fColumns, A.fColumns, fRows,
                   this_matrix_gpu, A_gpu, result_gpu);
 
-    result.fMatrix = MatrixXd(result.fRows, result.fColumns);
+        result.fMatrix = MatrixXd(result.fRows, result.fColumns);
         for (int i = 0; i < result.fRows; i++)
             for (int j = 0; j < result.fColumns; j++)
             {
