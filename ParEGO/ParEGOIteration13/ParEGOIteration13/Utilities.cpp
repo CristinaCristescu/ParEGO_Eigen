@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
 //
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
@@ -16,13 +15,10 @@
 
 #define RN rand()/(RAND_MAX+1.0)
 
-
 namespace Utilities
 {
-    
-    
-    void static latin_hyp(double **ax, int iter, int dim, double* xmin,
-                          double* xmax)
+    void static latin_hyp(std::vector<std::vector<double> >& ax, int iter, int dim, std::vector<double>& xmin,
+                          std::vector<double>& xmax)
     {
         int v;
         
@@ -64,7 +60,7 @@ namespace Utilities
 
     }
 
-    void static mysort(int *idx, double *val, int num)
+    void static mysort(std::vector<int>& idx, std::vector<double> val, int num)
     {
         std::vector< std::pair<double, int> > sorted;
         
@@ -77,11 +73,9 @@ namespace Utilities
         
         for(int i=1;i<=num;i++)
             idx[i]=sorted[i-1].second;
-        
     }
-    
-    // choose without replacement k items from n
-    void static cwr(int **target, int k, int n)
+
+    void static cwr(std::vector<int>& target, int k, int n)
     {
         int i,j;
         int l_t; //(length of the list at time t)
@@ -92,9 +86,9 @@ namespace Utilities
             exit(-1);
         }
         
-        (*target) = (int *)calloc((k+1),sizeof(int));
+        target.resize(k+1);
         int *to;
-        to = &((*target)[1]);
+        to = &target[1];
         
         int from[n];
         

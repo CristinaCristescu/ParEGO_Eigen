@@ -1,19 +1,29 @@
-//
-//  Vector.cpp
-//  ParEGOIteration6
-//
-//  Created by Bianca Cristina Cristescu on 24/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class MyMatrix
+ *
+ *
+ * \brief The class is a wrapper around a matrix object.
+ *
+ * This class enables the code to be flexibles and maintanable.
+ *
+ * \note Copyright (c) 2015 Bianca-Cristina Cristescu. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 25/01/15.
+ *
+ */
 
 #include "Matrix.h"
 #include "Vector.h"
 
 #include <stdio.h>
 #include <iostream>
+#include <vector>
 
-#define Debug_Matrix = false
-
+/// Matrix default Constructor.
 MyMatrix::MyMatrix(size_t m, size_t n)
 {
     fRows = n;
@@ -21,6 +31,7 @@ MyMatrix::MyMatrix(size_t m, size_t n)
     fMatrix = MatrixXd(fRows,fColumns);
 }
 
+/// Copy-constructor.
 MyMatrix::MyMatrix(const MyMatrix& matrix)
 {
     fRows = matrix.fRows;
@@ -28,14 +39,17 @@ MyMatrix::MyMatrix(const MyMatrix& matrix)
     fMatrix = matrix.fMatrix;
 }
 
+/// Destructor.
 MyMatrix::~MyMatrix()
 {}
 
+/// Insert an element.
 void MyMatrix::insert(int i, int j, double val)
 {
     fMatrix(i,j) = val;
 }
 
+/// Operator=
 MyMatrix& MyMatrix::operator=(const MyMatrix& A)
 {
     if (this == &A)
@@ -46,6 +60,7 @@ MyMatrix& MyMatrix::operator=(const MyMatrix& A)
     return *this;
 }
 
+/// Operator*
 const MyMatrix MyMatrix::operator*(const MyMatrix& A) const
 {
     MyMatrix result;
@@ -55,6 +70,7 @@ const MyMatrix MyMatrix::operator*(const MyMatrix& A) const
     return result;
 }
 
+/// Operator*
 const MyMatrix MyMatrix::operator*(const MyVector& A) const
 {
     MyMatrix result;
@@ -64,6 +80,7 @@ const MyMatrix MyMatrix::operator*(const MyVector& A) const
     return result;
 }
 
+/// Operator+
 const MyMatrix MyMatrix::operator+(const MyMatrix& A) const
 {
     MyMatrix result;
@@ -73,6 +90,7 @@ const MyMatrix MyMatrix::operator+(const MyMatrix& A) const
     return result;
 }
 
+/// Compute the determinant of teh matrix.
 double MyMatrix::posdet()
 {
     // *** NB: this function changes R !!! ***
@@ -95,6 +113,7 @@ double MyMatrix::posdet()
     return(detR);
 }
 
+/// Compute teh inverse of the matrix.
 MyMatrix MyMatrix::inverse()
 {
     MyMatrix result(fRows, fColumns);
@@ -107,6 +126,7 @@ MyMatrix MyMatrix::inverse()
     return result;
 }
 
+/// Stream operator.
 ostream& operator<<(ostream& os, const MyMatrix& dt)
 {
     os << dt.fMatrix;
@@ -129,7 +149,7 @@ MyVector::MyVector(size_t n, double init_value)
 
 //Construct a Vector object from an array.
 //Start from index 1 in the array.
-MyVector::MyVector(size_t n, double* vector)
+MyVector::MyVector(size_t n, std::vector<double> vector)
 {
     fN = n;
     fVector = VectorXd(fN);

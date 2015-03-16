@@ -1,41 +1,79 @@
-//
-//  WeightVector.cpp
-//  ParEGOIteration4
-//
-//  Created by Bianca Cristina Cristescu on 04/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/*
+ * \class WeightVector
+ *
+ *
+ * \brief Representation of weight for scalarizinf multiple dimension solutions.
+ *
+ * This class models the weighting system that enables use to scalarize
+ * a multi-dimensional solution to be used in the optimization problem to create
+ * a surrogate model function for the real expensive function.
+ *
+ * \note Copyright (c) 2006 Joshua Knowles. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 04/02/15.
+ *
+ */
 
 #include "WeightVector.h"
 
 #include <math.h>
 
-WeightVector::WeightVector(int noobjectives)
+#define MAX_K 5
+#define NORM_WEIGHT 300
+
+/**
+  * Creates an instance of a weight vector.
+  *
+  * @param[in] objectivesNumber - The number of objectives the function has.
+  */
+WeightVector::WeightVector(int objectivesNumber):
+normwv(NORM_WEIGHT, std::vector<double>(MAX_K))
 {
-    fobjectives = noobjectives;
+    fobjectives = objectivesNumber;
     next = -1;
     add = 1;
     change = true;
     
-    
-    if(fobjectives==2)
-        N=10;  // gives 11 weight vectors  - the formula is: number of weight vectors = (N+k-1)!/N!(k-1)! where k is number of objectives
+    //the formula is: number of weight vectors = (N+k-1)!/N!(k-1)!
+    //first dimension wv: #weight vectors^nobjs
+    //first dimension normwv: N+k-1 choose k-1 ($^{N+k-1}C_{k-1}$)
+    if(fobjectives==2){
+        N=10;  // gives 11 weight vectors  - of objectives
+        wvSize = pow(11, fobjectives);
+        wv.resize(wvSize, std::vector<int>(MAX_K));
+    }
     else if(fobjectives==3)
+    {
         N=4;  // gives 15 weight vectors
+        wvSize = pow(15, fobjectives);
+        wv.resize(wvSize, std::vector<int>(MAX_K));
+
+    }
     else if(fobjectives==4)
+    {
         N=3;   // gives 20 weight vectors
-    
+        wvSize = pow(20, fobjectives);
+        wv.resize(wvSize, std::vector<int>(MAX_K));
+    }
+
     snake_wv();
 }
 
-
-
-void WeightVector::changeWeights(int iter, double* newvector)
+/** Changes the weight vector.
+  * The weights are changes every 5 iterations.
+  *
+  * @param[in] iter - The current iteration number.
+  * @param[out] newVector - The new weights vector for the next iterations.
+  */
+void WeightVector::changeWeights(int iter, std::vector<double>& newVector)
 {
-    //  double recomp_prob=1.0;
-    
+    // Change the weight vector.
     if(iter%5==2)
-        change = true;  // change the weight vector
+        change = true;
     
     if(change)
     {
@@ -44,7 +82,7 @@ void WeightVector::changeWeights(int iter, double* newvector)
         next+=add;
         for(int k=0;k<fobjectives;k++)
         {
-            newvector[k]=normwv[next][k];
+            newVector[k]=normwv[next][k];
         }
     }
     
@@ -53,21 +91,24 @@ void WeightVector::changeWeights(int iter, double* newvector)
     //fprintf(stdout, "%.2lf %.2lf weightvectors %d %d\n", newvector[0], newvector[1], next, add);
 }
 
-// function to create evenly spaced normalized weight vectors
+/** Creates evenly spaced normalized weight vectors.
+  * This funtion uses the method of generating reflected k-ary Gray codes
+  * in order to generate every normalized weight vector of 
+  * k fSearchSpaceDimensions and s divisions, so that they `snake' in the space,
+  * i.e., each weight vector is near the previous one. 
+  * This is useful for MOO search using weight vectors.
+  *
+  */
 void WeightVector::snake_wv()
 {
-    // This funtion uses the method of generating reflected k-ary Gray codes
-    // in order to generate every normalized weight vector of k fSearchSpaceDimensions and
-    // s divisions, so that they `snake' in the space, i.e., each wv is near the
-    // previous one. This is useful for MOO search using weight vectors.
-    double dwv[40402][MAX_K];  // first dimension needs to be #weight vectors^nobjs
-    int nwvs;
+    // First dimension needs to be #weight vectors^nobjs.
+    std::vector<std::vector<double> > dwv(wvSize, std::vector<double>(MAX_K));
+    int wvsSize;
     
     int i,j;
     int n;
     int m;
     int d=fobjectives-1;
-    //int b;
     int sum;
     int count=0;
     
@@ -116,9 +157,13 @@ void WeightVector::snake_wv()
     }
     //  printf("\n\n");
     //  printf("%d weight vectors generated\n",count);
-    nwvs=count;
+    wvsSize=count;
 }
 
+/** Auxiliary method of the snake methods.
+ *
+ * @param[in] n - Internal paramenter.
+ */
 void WeightVector::reverse(int n)
 {
     int h,i,j;

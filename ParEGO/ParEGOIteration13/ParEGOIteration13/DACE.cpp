@@ -1,26 +1,67 @@
-//
-//  DACE.cpp
-//  ParEGOIteration4
-//
-//  Created by Bianca Cristina Cristescu on 05/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class DACE
+ *
+ *
+ * \brief The class represents the DACE model of an optimization function.
+ *
+ * This class builds the function model for the optimization function
+ * and sets all the hyperparameters and provides the routines for evaluting a
+ * sample points using the estimated function.
+ *
+ *
+ * \note Copyright (c) 2006 Joshua Knowles. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 05/02/15.
+ *
+ */
 
 #include <cstdlib>
+#include <iostream>
+#include <math.h>
+
+#include "DACE.h"
+#include "SearchSpace.h"
 
 #define Debug false
 #define PI 3.141592653
 #define INFTY 1.0e35;
 #define RN rand()/(RAND_MAX+1.0)
 
-#include <iostream>
-#include <math.h>
-
 using namespace std;
 
-#include "DACE.h"
+/**
+  * Creates the DACE model for the function characterized by the given search
+  * space.
+  *
+  * @param[in] space - The search space for the function to be estimated.
+  *
+  */
+DACE::DACE(SearchSpace* space):
+gtheta(space->getSearchSpaceDimensions()),
+gp(space->getSearchSpaceDimensions())
+{
+    daceSpace = space;
+    fNoParamDACE=daceSpace->getSearchSpaceDimensions()*2+2;
+    gmu = 0;
+    gsigma = 0;
+    gymin = INFTY;
+    pInvR = MyMatrix();
+    pgy = MyVector();
+    glik = 0;
+    ymin=INFTY;
 
-
+    
+    one_pInvR = MyMatrix();
+    onetransp_pInvR = MyMatrix();
+    onetransp_pInvR_one = 0;
+    predict_y_constant = MyVector();
+    
+    init_gz();
+}
 
 double static myabs(double v)
 {
@@ -30,72 +71,58 @@ double static myabs(double v)
         return -v;
 }
 
-DACE::DACE(SearchSpace* space)
-{
-    daceSpace = space;
-    fNoParamDACE=daceSpace->fSearchSpaceDim*2+2;
-    ymin=INFTY;
-    gmu = 0;
-    gsigma = 0;
-    gtheta = NULL;
-    gp = NULL;
-    gymin = 0;
-    pInvR = MyMatrix();
-    pgy = MyVector();
-    one_pInvR = MyMatrix();
-    onetransp_pInvR = MyMatrix();
-    onetransp_pInvR_one = 0;
-    predict_y_constant = MyVector();
-    glik = 0;
-    
-    //take them outttttt
-    pax = NULL; // a pointer
-    pay = NULL;
-    
-    init_gz();
-}
-
-DACE::~DACE()
-{
-    free(gtheta);
-    free(gp);
-}
-
-double DACE::correlation(double *xi, double *xj, double *theta, double *p, int dim)
-{
-    
-        //for(int d=1;d<=dim;d++)
-            //fprintf(stderr,, "CORRELATION: %.5lf %.5lf %.5lf %.5lf\n", xi[d],xj[d],theta[d],p[d]);
-    return exp(-weighted_distance(xi,xj));
-}
-
-double DACE::weighted_distance(double *xi, double *xj)
+/**
+  * Computes the weighted distance between to sample points 
+  * in the correlation matrix.
+  * 
+  * @param[in] xi - Sample point.
+  * @param[in] xj - Sample point.
+  *
+  */
+double DACE::weighted_distance(const std::vector<double>& xi, const std::vector<double>& xj)
 {
     double sum=0.0;
     
-    double nxi[daceSpace->fSearchSpaceDim+1];
-    double nxj[daceSpace->fSearchSpaceDim+1];
+    double nxi[daceSpace->getSearchSpaceDimensions()+1];
+    double nxj[daceSpace->getSearchSpaceDimensions()+1];
     
-    
-    
-    for(int h=1;h<=daceSpace->fSearchSpaceDim;h++)
+    for(int h=1;h<=daceSpace->getSearchSpaceDimensions();h++)
     {
         nxi[h] = (xi[h]-daceSpace->fXMin[h])/(daceSpace->fXMax[h]-daceSpace->fXMin[h]);
         nxj[h] = (xj[h]-daceSpace->fXMin[h])/(daceSpace->fXMax[h]-daceSpace->fXMin[h]);
-        
-        //if(debug_iter == 48)
-            //printf("theta= %lg p= %lg\n",gtheta[h], gp[h]);
         sum += gtheta[h]*pow(myabs(nxi[h]-nxj[h]),gp[h]);
-        //      sum += 4.0*pow(myabs(xi[h]-xj[h]),2.0);     // theta=4 and p=2
-        
     }
     if(Debug)
         fprintf(stderr, "sum: %.5lf", sum);
-    return(sum);
+        return(sum);
 }
 
+/**
+  * Computes the correlation between two sample points.
+  *
+  * @param[in] xi - Sample point.
+  * @param[in] xj - Sample point.
+  * @param[in] theta - The  activity parameter.
+  * @param[in] p - The smoothness parameter.
+  * @param[in] dim -The dimension of the correlation.
+  *
+  */
+double DACE::correlation(const std::vector<double>& xi, const std::vector<double>& xj,
+                         const std::vector<double>& theta, const std::vector<double>& p,
+                         int dim)
+{
+    return exp(-weighted_distance(xi,xj));
+}
 
-void DACE::build_R(double **ax, MyMatrix& R)
+/** 
+  * Build a correlation matrix.
+  *
+  * @param[in] solutionVector - The solution vectors to build the matrix from.
+  * @param[out] R - The correlation matrix.
+  *
+  */
+void DACE::build_R(const std::vector<std::vector<double> >& solutionVector,
+                   MyMatrix& R)
 {
     // takes the array of x vectors, theta, and p, and returns the correlation matrix R.
     for(int i=0;i<fCorrelationSize;i++)
@@ -103,8 +130,8 @@ void DACE::build_R(double **ax, MyMatrix& R)
         for(int j=0;j<fCorrelationSize;j++)
         {
             if(Debug)
-                fprintf(stderr,"%.5lf %.5lf %.5lf  %.5lf %d\n", ax[i][1],ax[j][1],gtheta[1], gp[1], daceSpace->fSearchSpaceDim);
-            R.insert(i,j,correlation(ax[i+1],ax[j+1], gtheta, gp, fCorrelationSize));
+                fprintf(stderr,"%.5lf %.5lf %.5lf  %.5lf %d\n", solutionVector[i][1],solutionVector[j][1],gtheta[1], gp[1], daceSpace->getSearchSpaceDimensions());
+            R.insert(i,j,correlation(solutionVector[i+1], solutionVector[j+1], gtheta, gp, fCorrelationSize));
             if(Debug)
                 fprintf(stderr,"%.5lf\n", R(i,j));
         }
@@ -114,16 +141,46 @@ void DACE::build_R(double **ax, MyMatrix& R)
     
 }
 
-double DACE::s2(double **ax)
+/** 
+  * Computes the unbiased predictor of y.
+  *
+  * @param[in] solutionVector - The vector of solutions.
+  *
+  */
+double DACE::predict_y(const std::vector<std::vector<double> >& solutionVector)
+{
+    double y_hat;
+    MyVector one(fCorrelationSize, 1);
+    
+    MyVector r(fCorrelationSize);
+    for(int i=0;i<fCorrelationSize;i++)
+    {
+        r.insert(i, correlation(solutionVector[fCorrelationSize+1],solutionVector[i+1],gtheta,gp,daceSpace->getSearchSpaceDimensions()));
+    }
+    
+    double intermidiate = ((r.transpose()*pInvR)*(predict_y_constant))(0,0);
+    y_hat = gmu + intermidiate;
+    
+    return(y_hat);
+    
+}
+
+/** 
+  * Computes the mean squarred error of the predictor.
+  *
+  * @param[in] solutionVector - The solution vector.
+  * 
+  */
+double DACE::s2(const std::vector<std::vector<double> >& solutionVector)
 {
     double s2;
     
     MyVector r(fCorrelationSize);
     for(int i=0;i<fCorrelationSize;i++)
     {
-        //fprintf(stderr,"theta=%.5lf p=%.5lf ax[n+1]=%.5lf, ax[%d+1]=%.5lf\n", gtheta[i+1],gp[i+1],ax[fCorrelationSize+1][i+1],i, ax[i+1][i]);
-        r.insert(i, correlation(ax[fCorrelationSize+1],ax[i+1],gtheta,gp,daceSpace->fSearchSpaceDim));
-        //fprintf(stderr,"r[i]=%lg \n",r(i));
+        r.insert(i, correlation(solutionVector[fCorrelationSize+1],
+                                solutionVector[i+1],gtheta,gp,
+                                daceSpace->getSearchSpaceDimensions()));
     }
     double intermediate = (1- (r.transpose()*pInvR*r)(0,0) +
                            pow((1-(onetransp_pInvR*r)(0,0)),2)/
@@ -134,6 +191,13 @@ double DACE::s2(double **ax)
     return(s2);
 }
 
+/** 
+  * Computes teh mean of the stochastic process.
+  *
+  * @param[in] y - The y vector.
+  * @param[in] iter - The current iteration.
+  *
+  */
 double DACE::mu_hat(MyVector& y, int iter)
 {
     double numerator, denominator;
@@ -145,6 +209,12 @@ double DACE::mu_hat(MyVector& y, int iter)
     
 }
 
+/**
+ * Computes the standard deviation of the stochastic process.
+ *
+ * @param[in] y - The y vector.
+ *
+ */
 double DACE::sigma_squared_hat(MyVector& y)
 {
     double numerator, denominator;
@@ -158,47 +228,21 @@ double DACE::sigma_squared_hat(MyVector& y)
     return (numerator/denominator);
 }
 
-double DACE::predict_y(double **ax)
+/**
+ * Computes the likelihood of the stochastic process.
+ *
+ * @param[in] param - The paramenters of teh model.
+ * @param[in] solutionVectors - The solution vectors.
+ * @param[in] measuredFit - The measured fit of the solutions.
+ *
+ */
+double DACE::likelihood(const std::vector<double>& param,
+                        const std::vector<std::vector<double> >& solutionVectors,
+                        const std::vector<double>& measuredFit)
 {
-    double y_hat;
-    MyVector one(fCorrelationSize, 1);
-    
-    MyVector r(fCorrelationSize);
-    for(int i=0;i<fCorrelationSize;i++)
-    {
-        r.insert(i, correlation(ax[fCorrelationSize+1],ax[i+1],gtheta,gp,daceSpace->fSearchSpaceDim));
-        //fprintf(stderr,"r[%di]=%.5lf ax[n+1][1]=%.5lf\n",i, r(i), ax[fCorrelationSize+1][1]);
-    }
-    
-    double intermidiate = ((r.transpose()*pInvR)*(predict_y_constant))(0,0);
-    y_hat = gmu + intermidiate;
-    
-    //fprintf(stderr,"y_hat=%f mu_hat=%f\n",y_hat, mu_hat);
-    
-    /*
-     if((y_hat>100)||(y_hat<-100))
-     {
-     //      fprintf(out,"mu_hat=%.5lf theta=%.5lf p=%.5lf\n", mu_hat, theta[1], p[1]);
-     for(int i=1;i<=n;i++)
-     fprintf(out,"%.2f-%.2f log(r[i])=%le ", ax[n+1][1],ax[i][1] , log(r[i]));
-     }
-     */
-    return(y_hat);
-    
-}
-
-
-
-
-double DACE::likelihood(double *param, double** pax, double* pay)
-{
-    // uses global variable storing the size of R: iter
-    // uses global variable storing the dimension of the search space: dim
-    // uses global ax and ay values
-    
     double lik;
     
-    // constraint handling
+    // Constraint handling.
     double sum=0.0;
     for(int j=1;j<fNoParamDACE;j++)
     {
@@ -210,16 +254,16 @@ double DACE::likelihood(double *param, double** pax, double* pay)
         return(-sum);
     sum=0.0;
     bool outofrange=false;
-    for(int j=1;j<=daceSpace->fSearchSpaceDim;j++)
+    for(int j=1;j<=daceSpace->getSearchSpaceDimensions();j++)
     {
-        if(param[daceSpace->fSearchSpaceDim+j]>=2.0)
+        if(param[daceSpace->getSearchSpaceDimensions()+j]>=2.0)
         {
-            sum+=param[daceSpace->fSearchSpaceDim+j]-2.0;
+            sum+=param[daceSpace->getSearchSpaceDimensions()+j]-2.0;
             outofrange=true;
         }
-        else if(param[daceSpace->fSearchSpaceDim+j]<1.0)
+        else if(param[daceSpace->getSearchSpaceDimensions()+j]<1.0)
         {
-            sum+=-(param[daceSpace->fSearchSpaceDim+j]-1.0);
+            sum+=-(param[daceSpace->getSearchSpaceDimensions()+j]-1.0);
             outofrange=true;
         }
     }
@@ -228,173 +272,153 @@ double DACE::likelihood(double *param, double** pax, double* pay)
     
     double coefficient;
 
-    double sigma=param[2*daceSpace->fSearchSpaceDim+1];
+    double sigma=param[2*daceSpace->getSearchSpaceDimensions()+1];
     
     MyMatrix R(fCorrelationSize,fCorrelationSize);
-    build_R(pax, R);
+    build_R(solutionVectors, R);
     
-    MyVector y = MyVector(fCorrelationSize, pay);
+    MyVector y = MyVector(fCorrelationSize, measuredFit);
     
     double detR = R.posdet();
     
-    // fprintf(stderr, "sigma= %lg  sqrt(detR)= %lg\n", sigma, sqrt(detR));
     coefficient = 1.0/(pow(2*PI,(double)fCorrelationSize/2.0)*pow(sigma,(double)fCorrelationSize/2.0)*sqrt(detR));
-    // fprintf(stderr,"coefficient = %lg", coefficient);
     
     lik = coefficient*exp(-(double)fCorrelationSize/2.0);
     
     return(-lik);
-    
-    
 }
 
-
-void DACE::buildDACE(bool change, int iter)
+/**
+  * Builds the entire DACE model for the given function, setting the parameters
+  * computing the correlation matrix, the inverse of it and the y vector.
+  *
+  * @param[in] iter - The current iteration number.
+  *
+  */
+void DACE::buildDACE(int iter)
 {
-    
-    gp=(double *)calloc((daceSpace->fSearchSpaceDim+1),sizeof(double));
-    gtheta=(double *)calloc((daceSpace->fSearchSpaceDim+1),sizeof(double));
-    
-    double **param;
-    param = (double **)calloc((fNoParamDACE+2),sizeof(double *));
-    for(int i=0;i<=fNoParamDACE+1;i++)
-        param[i]=(double *)calloc((fNoParamDACE+1),sizeof(double));
-    
-    double **bestparam;
-    bestparam = (double **)calloc((fNoParamDACE+2),sizeof(double *));
-    for(int i=0;i<=fNoParamDACE+1;i++)
-        bestparam[i]=(double *)calloc((fNoParamDACE+1),sizeof(double));
-    
-    MyVector y = MyVector(fCorrelationSize, *pay);
-    
-    
+    bool change;
+    std::vector<std::vector<double> > param(fNoParamDACE+2, std::vector<double>(fNoParamDACE+1));
+    std::vector<std::vector<double> > bestparam(fNoParamDACE+2, std::vector<double>(fNoParamDACE+1));
     double best_lik=INFTY;
+    
     int besti;
-    // ME: changed from change=1
     if((change=1))
     {
         
         for(int i=0;i<30;i++)
         {
-            for(int d=1; d<=daceSpace->fSearchSpaceDim; d++)
+            for(int d=1; d<=daceSpace->getSearchSpaceDimensions(); d++)
             {
                 double rn1 = RN;
-                //////fprintf(stderr,"rn10 = %lg\n", rn1);
                 double rn2 = RN;
-                ////fprintf("rn11 = %lg\n", rn2);
                 gtheta[d]=1+rn1*2;
                 gp[d]=1.01+rn2*0.98;
-                //////fprintf(stderr,"rn1=%lg rn2=%lg gtheta[d]=%lg gp[d]=%lg\n", rn1, rn2, gtheta[d], gp[d]);
             }
-            //ME: Carefull with the indexes!!! It starts from 1.
-            MyMatrix R(fCorrelationSize, fCorrelationSize);
-            build_R(*pax, R);
-            //DO NOT EVER COMMENT THIS OUT
+            MyVector y;
+            MyMatrix R;
+            if(iter>11*daceSpace->getSearchSpaceDimensions()+24)
+            {
+                fCorrelationSize = 11*daceSpace->getSearchSpaceDimensions()+24;
+                
+                daceSpace->chooseAndUpdateSolutions(iter, fCorrelationSize);
+                
+                R = MyMatrix(fCorrelationSize, fCorrelationSize);
+                build_R(daceSpace->fSelectedXVectors, R);
+                y = MyVector(fCorrelationSize, daceSpace->fSelectedMeasuredFit);
+            }
+            else
+            {
+                fCorrelationSize=iter;
+                R = MyMatrix(fCorrelationSize, fCorrelationSize);
+                build_R(daceSpace->fXVectors, R);
+                y = MyVector(fCorrelationSize, daceSpace->fMeasuredFit);
+
+            }
+            
             double detR = R.posdet();
             assert (detR > 0);
-            //cout<< "THe MATRIX:"<<R<<"\n";
             pInvR = R.inverse();
-            //cout<<"MATRIX INV IN CHANGE" <<pInvR<<"END_INV\n";
             MyVector one = MyVector(fCorrelationSize, 1);
             one_pInvR = one*pInvR;
             onetransp_pInvR_one = (one.transpose()*pInvR*one)(0,0);
-            
             gmu=mu_hat(y, iter);
-            //fprintf(stderr,,"OK - mu %lg calculated\n", gmu);
+            //fprintf(stderr,"OK - mu %lg calculated\n", gmu);
             gsigma=sigma_squared_hat(y);
-            //fprintf(stderr,,"OK - sigma %lg calculated\n", gsigma);
+            //fprintf(stderr,"OK - sigma %lg calculated\n", gsigma);
             
-            for(int j=1;j<=daceSpace->fSearchSpaceDim;j++)
+            for(int j=1;j<=daceSpace->getSearchSpaceDimensions();j++)
             {
                 param[1][j]=gtheta[j];
-                param[1][j+daceSpace->fSearchSpaceDim]=gp[j];
+                param[1][j+daceSpace->getSearchSpaceDimensions()]=gp[j];
             }
-            param[1][2*daceSpace->fSearchSpaceDim+1]=gsigma;
-            param[1][2*daceSpace->fSearchSpaceDim+2]=gmu;
+            param[1][2*daceSpace->getSearchSpaceDimensions()+1]=gsigma;
+            param[1][2*daceSpace->getSearchSpaceDimensions()+2]=gmu;
             
-                                    //for (int i = 1; i < 2*daceSpace->fSearchSpaceDim+2+1; i++)
-                                        //fprintf(stderr,, "%lg ", param[1][i]);
-                                    //fprintf(stderr,, "\n");
-            
-            glik=likelihood(param[1], *pax, *pay);
-            //fprintf(stderr,"glik= %lg best_lik= %lg  BETTER....\n", glik, best_lik);
+            if(iter>11*daceSpace->getSearchSpaceDimensions()+24)
+            {
+                glik=likelihood(param[1], daceSpace->fSelectedXVectors, daceSpace->fSelectedMeasuredFit);
+            }
+            else
+            {
+                glik=likelihood(param[1], daceSpace->fXVectors, daceSpace->fMeasuredFit);
+
+            }
             
             if(glik<best_lik)
             {
-                //printf(stderr,"bestparam:\n");
                 besti = i;
                 best_lik=glik;
                 for(int j=1;j<=fNoParamDACE;j++)
                 {
                     bestparam[1][j]=param[1][j];
-                    //printf(stderr,"%lg ", bestparam[1][j]);
                 }
-                //printf(stderr,"\n");
             }
-            
         }
     }
     
-    //fprintf(stderr,," theta_last[d]=%lg %lg p_last[d]=%lg %lg\n", gtheta[1], gtheta[2], gp[1], gp[2]);
-
-    
-    for (int i=1;i <= daceSpace->fSearchSpaceDim; i++)
+    for (int i=1;i <= daceSpace->getSearchSpaceDimensions(); i++)
     {
         gtheta[i]=bestparam[1][i];
-        gp[i]=bestparam[1][i+daceSpace->fSearchSpaceDim];
+        gp[i]=bestparam[1][i+daceSpace->getSearchSpaceDimensions()];
     }
-    gsigma=bestparam[1][2*daceSpace->fSearchSpaceDim+1];
-    gmu=bestparam[1][2*daceSpace->fSearchSpaceDim+2];
+    gsigma=bestparam[1][2*daceSpace->getSearchSpaceDimensions()+1];
+    gmu=bestparam[1][2*daceSpace->getSearchSpaceDimensions()+2];
     
-    //fprintf(stderr,," theta_last[d]=%lg %lg p_last[d]=%lg %lg\n", gtheta[1], gtheta[2], gp[1], gp[2]);
-
 //    fprintf(stderr,"FINAL DACE parameters = \n");
-//    for(int d=1; d<=daceSpace->fSearchSpaceDim; d++)
+//    for(int d=1; d<=daceSpace->getSearchSpaceDimensions(); d++)
 //        fprintf(stderr,,"%lg ", gtheta[d]);
-//    for(int d=1; d<=daceSpace->fSearchSpaceDim; d++)
+//    for(int d=1; d<=daceSpace->getSearchSpaceDimensions(); d++)
 //        fprintf(stderr,,"%lg ", gp[d]);
-//    fprintf(stderr,," %lg %lg\n", bestparam[1][2*daceSpace->fSearchSpaceDim+1], bestparam[1][2*daceSpace->fSearchSpaceDim+2]);
+//    fprintf(stderr,," %lg %lg\n", bestparam[1][2*daceSpace->getSearchSpaceDimensions()+1], bestparam[1][2*daceSpace->getSearchSpaceDimensions()+2]);
 //    
     
     /* Use the full R matrix */
     fCorrelationSize=iter;
-    pax = &daceSpace->fXVectors;
-    //ME: Carefull with the indexes!!! It starts from 1.
     MyMatrix pgR(fCorrelationSize,fCorrelationSize);
-    build_R(*pax, pgR);
+    build_R(daceSpace->fXVectors, pgR);
     pgR.posdet();
-    //long double det =  pgR.determinant();
-    //printf("det = %lg\n",det);
     pInvR = pgR.inverse();
-    //cout<<"MATRIX INV" <<InvR<<"\n";
     pgy = MyVector(fCorrelationSize, daceSpace->fMeasuredFit);
     MyVector one = MyVector(fCorrelationSize, 1);
     one_pInvR = one*pInvR;
     onetransp_pInvR = one.transpose()*pInvR;
     onetransp_pInvR_one = (one.transpose()*pInvR*one)(0,0);
     predict_y_constant = pgy-(one*gmu);
-    /* ***************************** */
-    
-    //   fprintf(out,"predicted R matrix built OK:\n");
     
     gymin = INFTY;
     
     for(int i = 1;i < fCorrelationSize;i++)
         if(pgy(i)<gymin)
             gymin = pgy(i);
-    
-    //printf("gymin %lg \n", gymin);
-    
-    for(int i=0;i<=fNoParamDACE+1;i++)
-        free(param[i]);
-    free(param);
-    
-    for(int i=0;i<=fNoParamDACE+1;i++)
-        free(bestparam[i]);
-    free(bestparam);
 }
 
-//Evaluation functions
+/**
+  * Computes the standard distribution.
+  *
+  * @param[in] z - The point.
+  *
+  */
 double DACE::standard_distribution(double z)
 {
     double zv;
@@ -424,6 +448,86 @@ double DACE::standard_distribution(double z)
         }
     }
     return(zv);
+}
+
+/** 
+  * Computes the standard density.
+  *
+  * @param[in] z - The point.
+  *
+  */
+double DACE::standard_density(double z)
+{
+    double psi;
+    
+    psi = (1/sqrt(2*PI))*exp(-(z*z)/2.0);
+    return (psi);
+    
+}
+
+/** 
+  * Computes teh expected improvement of the current solution point.
+  *
+  * @param[in] yhat - The y prediction.
+  * @param[in] ymin - The minimum y.
+  * @param[in] s - Square of the errror.
+  *
+  */
+double  DACE::expected_improvement(double yhat, double ymin, double s)
+{
+    double E;
+    double sdis;
+    double sden;
+    if(s<=0)
+        return 0;
+    if((ymin-yhat)/s < -7.0)
+        sdis = 0.0;
+    else if((ymin-yhat)/s > 7.0)
+    {
+        sdis = 1.0;
+    }
+    else
+        sdis = standard_distribution( (ymin-yhat)/s );
+
+    sden = standard_density((ymin-yhat)/s);
+
+    E = (ymin - yhat)*sdis + s*sden;
+    return E;
+}
+
+/** 
+  * Returns -(expected improvement), given the solution x.
+  *
+  * @param[in] x - The solution for which to compute the ei.
+  * @param[in] iter - The current iteration.
+  *
+  */
+double DACE::wrap_ei(double *x, int iter)
+{
+    
+    for(int d=1;d<=daceSpace->getSearchSpaceDimensions(); d++)
+    {
+        (daceSpace->fXVectors)[fCorrelationSize+1][d] = x[d];
+    }
+    double fit;
+    // predict the fitness
+    fit=predict_y(daceSpace->fXVectors);
+    
+    // compute the error
+    double ss;
+    ss=s2(daceSpace->fXVectors);
+    
+    // compute the expected improvement
+    double ei;
+    ei=expected_improvement(fit, gymin, sqrt(ss));
+    //fprintf(stderr,"-ei in wrap_ei() = %.4lg\n", -ei);
+    
+    for(int d=1; d <= daceSpace->getSearchSpaceDimensions(); d++)
+    {
+        if((x[d]>daceSpace->fXMax[d])||(x[d]<daceSpace->fXMin[d]))
+            ei=-1000;
+    }
+    return(-ei);
 }
 
 void DACE::init_gz()
@@ -505,86 +609,6 @@ void DACE::init_gz()
     gz[74]=0.99999999999993;
     gz[75]=0.99999999999997;
     
-}
-
-
-double DACE::standard_density(double z)
-{
-    double psi;
-    
-    psi = (1/sqrt(2*PI))*exp(-(z*z)/2.0);
-    return (psi);
-    
-}
-
-double  DACE::expected_improvement(double yhat, double ymin, double s)
-{
-    double E;
-    double sdis;
-    double sden;
-    if(s<=0)
-        return 0;
-    //printf("expression: %lg", (ymin-yhat)/s);
-    if((ymin-yhat)/s < -7.0)
-        sdis = 0.0;
-    else if((ymin-yhat)/s > 7.0)
-    {
-        sdis = 1.0;
-    }
-    else
-        sdis = standard_distribution( (ymin-yhat)/s );
-    //printf("sdis: %lg\n", sdis);
-
-    sden = standard_density((ymin-yhat)/s);
-    //printf("sdis: %lg\n", sden);
-
-    E = (ymin - yhat)*sdis + s*sden;
-    return E;
-}
-
-
-// to move in a evaluation!?
-double DACE::wrap_ei(double *x, int iter)
-{
-    debug_iter = iter;
-    //fprintf(stderr,"ITER5 %d\n", iter);
-    for(int d=1;d<=daceSpace->fSearchSpaceDim; d++)
-    {    (*pax)[fCorrelationSize+1][d] = x[d];
-        
-        //fprintf(stderr,,"%.5lf %.5lf\n", x[d], (*pax)[fCorrelationSize+1][d]);
-    }
-    double fit;
-    // predict the fitness
-    fit=predict_y(*pax);
-    
-    //fprintf(stderr,"predicted fitness in wrap_ei() = %.4lg\n", fit);
-    
-    
-    // compute the error
-    double ss;
-    //ME: ss -least square error.
-    ss=s2(*pax);
-    //fprintf(stderr,"s^2 error in wrap_ei() = %.4lg\n", ss);
-    //fprintf(stderr,"%.9lf %.9lf \n", x[1], ss);
-    
-    
-    // compute the expected improvement
-    double ei;
-    ei=expected_improvement(fit, gymin, sqrt(ss));
-    //fprintf(stderr,"-ei in wrap_ei() = %.4lg\n", -ei);
-    
-    
-    for(int d=1; d <= daceSpace->fSearchSpaceDim; d++)
-    {
-        if((x[d]>daceSpace->fXMax[d])||(x[d]<daceSpace->fXMin[d]))
-            ei=-1000;
-    }
-    
-    ////fprintf(stderr,,"%.9lf\n", ei);
-    
-    //printf("WRAP_END\n");
-    // return the expected improvement
-    return(-ei);
 }
 
 

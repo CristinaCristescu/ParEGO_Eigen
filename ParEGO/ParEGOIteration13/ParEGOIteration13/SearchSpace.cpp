@@ -1,10 +1,21 @@
-//
-//  SearchSpace.cpp
-//  ParEGOIteration4
-//
-//  Created by Bianca Cristina Cristescu on 03/02/15.
-//  Copyright (c) 2015 Bianca Cristina Cristescu. All rights reserved.
-//
+/**
+ * \class SearchSpace
+ *
+ * \brief Class that describes the search space of the function to be optimized.
+ *
+ * This class contains all the necessary information about the function to be
+ * optimised such as solutions, costs, minimum and maximum values of the
+ * function and the fitness evaluation.
+ *
+ * \note Copyright (c) 2006 Joshua Knowles. All rights reserved.
+ *
+ * \author (last to touch it) Bianca-Cristina Cristescu
+ *
+ * \version $Revision: 13
+ *
+ * \date $Date: 03/02/15.
+ *
+ */
 
 #define PI 3.141592653
 
@@ -18,193 +29,69 @@
 #include <cassert>
 
 #define LARGE 2147000000
+#define MAX_K 5
 
-// The actual test functions.
-/* HERE 2
-Below are the current fitness function definitions. Add your functions here.
-The function should take an x and y array and compute the value of the y objectives
-from the x decision variables. Note that the first decision variable is x[1] and t
-he first objective is y[1], i.e. there is an offset to the array. */
-
-
-double static myabs(double v)
-{
-    if(v>=0.0)
-        return v;
-    else
-        return -v;
-}
-
-void SearchSpace::f_dtlz1a(double *x, double *y)
-{
-    
-    
-    double g = 0.0;
-    for(int i=2;i<=fSearchSpaceDim;i++)
-        g+= (x[i]-0.5)*(x[i]-0.5) - cos(2*PI*(x[i]-0.5)); // Note this is 20*PI in Deb's dtlz1 func
-    g += fSearchSpaceDim-1;
-    g *= 100;
-    
-    
-    y[1] = 0.5*x[1]*(1 + g);
-    y[2] = 0.5*(1-x[1])*(1 + g);
-}
-
-void SearchSpace::f_dtlz2a(double *x, double *y)
-{
-    double g = 0.0;
-    for(int i=3;i<=fSearchSpaceDim;i++)
-        g+=(x[i]-0.5)*(x[i]-0.5);
-    
-    
-    y[1] = (1 + g)*cos(pow(x[1],alph)*PI/2)*cos(pow(x[2],alph)*PI/2);
-    y[2] = (1 + g)*cos(pow(x[1],alph)*PI/2)*sin(pow(x[2],alph)*PI/2);
-    y[3] = (1 + g)*sin(pow(x[1],alph)*PI/2);
-}
-
-void SearchSpace::f_dtlz7a(double *x, double *y)
-{
-    double g,h,sum;
-    y[1]=x[1];
-    y[2]=x[2];
-    
-    g = 0.0;
-    for(int i=3;i<=fSearchSpaceDim;i++)
-    {
-        g+=x[i];
-    }
-    g*=9.0/(fSearchSpaceDim-fNoObjectives+1);
-    g+=1.0;
-    
-    sum=0.0;
-    for(int i=1;i<=fNoObjectives-1;i++)
-        sum += ( y[i]/(1.0+g) * (1.0+sin(3*PI*y[i])) );
-    h = fNoObjectives - sum;
-    
-    y[1]=x[1];
-    y[2]=x[2];
-    y[3]=(1 + g)*h;
-}
-
-void SearchSpace::f_vlmop3(double *x, double *y)
-{
-    y[1] = 0.5*(x[1]*x[1]+x[2]*x[2]) + sin(x[1]*x[1]+x[2]*x[2]);
-    y[2] = pow(3*x[1]-2*x[2]+4.0, 2.0)/8.0 + pow(x[1]-x[2]+1, 2.0)/27.0 + 15.0;
-    y[3] = 1.0 / (x[1]*x[1]+x[2]*x[2]+1.0) - 1.1*exp(-(x[1]*x[1]) - (x[2]*x[2]));
-}
-
-void SearchSpace::f_oka1(double *x, double *y)
-{
-    double x1p = cos(PI/12.0)*x[1] - sin(PI/12.0)*x[2];
-    double x2p = sin(PI/12.0)*x[1] + cos(PI/12.0)*x[2];
-    
-    y[1] = x1p;
-    y[2] = sqrt(2*PI) - sqrt(myabs(x1p)) + 2 * pow(myabs(x2p-3*cos(x1p)-3) ,0.33333333);
-}
-
-
-void SearchSpace::f_oka2(double *x, double *y)
-{
-//    printf("oka_2/n");
-//    for (int j=1; j < fSearchSpaceDim+1; j++)
-//    {
-//        printf( "%.5lf ", x[j]);
-//        printf( "%.5lf ", y[j]);
-//    }
-//    
-//    printf("\n");
-    
-    y[1]=x[1];
-    y[2]=1 - (1/(4*PI*PI))*pow(x[1]+PI,2) + pow(myabs(x[2]-5*cos(x[1])),0.333333333) + pow(myabs(x[3] - 5*sin(x[1])),0.33333333);
-    
-//    printf("after oka_2/n");
-//    for (int j=1; j < fSearchSpaceDim+1; j++)
-//    {
-//        printf( "%.5lf ", x[j]);
-//        printf( "%.5lf ", y[j]);
-//    }
-//    
-//    printf("\n");
-}
-
-void SearchSpace::f_vlmop2(double *x, double *y)
-{
-    
-    double sum1=0;
-    double sum2=0;
-    
-    for(int i=1;i<=2;i++)
-    {
-        sum1+=pow(x[i]-(1/sqrt(2.0)),2);
-        sum2+=pow(x[i]+(1/sqrt(2.0)),2);
-    }
-    
-    y[1] = 1 - exp(-sum1);
-    y[2] = 1 - exp(-sum2);
-}
-
-void SearchSpace::f_kno1(double *x, double *y)
-{
-    double f;
-    double g;
-    double c;
-    
-    
-    c = x[1]+x[2];
-    
-    f = 20-( 11+3*sin((5*c)*(0.5*c)) + 3*sin(4*c) + 5 *sin(2*c+2));
-    //  f = 20*(1-(myabs(c-3.0)/3.0));
-    
-    g = (PI/2.0)*(x[1]-x[2]+3.0)/6.0;
-    
-    y[1]= 20-(f*cos(g));
-    y[2]= 20-(f*sin(g));
-    
-}
-
-void SearchSpace::init_arrays(int n)
-{
-    // using a 1 offset to make things easier for use with NR routines and matrix routines
-    fXVectors = (double **)calloc((n+1),sizeof(double *));
-    for(int i=0;i<n+1;i++)
-        (fXVectors)[i]=(double *)calloc((fSearchSpaceDim+1),sizeof(double));
-    fMeasuredFit=(double *)calloc((n+1),sizeof(double));
-    
-    fSelectedXVectors = (double **)calloc((n+1),sizeof(double *));
-    for(int i=0;i<n+1;i++)
-        (fSelectedXVectors)[i]=(double *)calloc((fSearchSpaceDim+1),sizeof(double));
-    fSelectedMeasuredFit=(double *)calloc((n+1),sizeof(double));
-    
-    fCostVectors = (double **)calloc((n+2),sizeof(double *));
-    for(int i=0;i<=n+1;i++)
-        fCostVectors[i]=(double *)calloc((fSearchSpaceDim+1),sizeof(double));
-}
-
-/*
- To define a new fitness function, first provide information about
- it in the same way as done below for f_vlmop2. Then search for "HERE" again.
+/**
+ * Creates the search space and initializes it.
+ * This function sets all the environment for the function that is optimized.
+ *
+ * @param[in] name - The name of the function to optimize.
+ * @param[in] maxIter - The number of iterations to be run.
  */
-void SearchSpace::SetSearch()
+SearchSpace::SearchSpace(const char* name, int maxIter):
+fAbsMax(MAX_K), fAbsMin(MAX_K), fIdealObjective(MAX_K), fWeightVectors(MAX_K),
+fMeasuredFit(maxIter+1), fSelectedMeasuredFit(maxIter+1)
 {
-    
-    if(strcmp(fObjectiveFunctionName,"f_vlmop2")==0) // fitness function name, as it will be given on command line
+    fObjectiveFunctionName = name;
+    setSearch();
+    // TO DO: CHange from +1
+    fXVectors.resize(maxIter+1, std::vector<double>(fSearchSpaceDim+1));
+    fSelectedXVectors.resize(maxIter+1, std::vector<double>(fSearchSpaceDim+1));
+    fCostVectors.resize(maxIter+2, std::vector<double>(fSearchSpaceDim+1));
+    alph = 1.0;
+}
+
+/** 
+ * Sets all the information about the function that is optimised.
+ * :
+ * - number of objectives
+ * - dimensionality of the function.
+ * - minimum/maximum function values.
+ * - ideal objective values.
+ * - weight vector values.
+ * - absolute minimum/maximum of the objective space.
+ *
+ */
+void SearchSpace::setSearch()
+{
+    // Fitness function name, as it will be given on command line
+    if(strcmp(fObjectiveFunctionName,"f_vlmop2")==0)
     {
         fNoObjectives = 2;  // number of objectives in the fCostVectors
         fSearchSpaceDim = 2;    // number of decision variables
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        for(int d=1;d<=fSearchSpaceDim;d++)
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
+        // Give the minimum and maximum value of every decision variable
+        // (notice the array offset).
+        for(int d=1; d<=fSearchSpaceDim; d++)
         {
-            fXMin[d]=-2.0;  // give the minimum and maximum value of every decision variable (notice the array offset)
+            fXMin[d]=-2.0;
             fXMax[d]=2.0;
         }
         
         // There is no offset in the following arrays
-        fIdealObjective[0]=0.0;  // set all objective ideal points to zero
+        // Set all objective ideal points to zero
+        fIdealObjective[0]=0.0;
         fIdealObjective[1]=0.0;
-        fWeightVectors[0]=0.9;     // set the weight vectors of each objective to anything, so long as it sums to 1
+        // Set the weight vectors of each objective to anything,
+        // so long as it sums to 1.
+        fWeightVectors[0]=0.9;
         fWeightVectors[1]=0.1;
-        fAbsMax[0]=1.0;  // give the myabsolute values of the maximum and minimum of each objective space fSearchSpaceDimension. If this is not known, then make sure you overestimate the extent of the space.
+        // Give the myabsolute values of the maximum and minimum of each
+        // objective space in fSearchSpaceDimension.
+        // If this is not known, then make sure you overestimate the extent
+        // of the space.
+        fAbsMax[0]=1.0;
         fAbsMin[0]=0.0;
         fAbsMax[1]=1.0;
         fAbsMin[1]=0.0;
@@ -213,8 +100,8 @@ void SearchSpace::SetSearch()
     {
         fNoObjectives = 2;
         fSearchSpaceDim = 6;
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
         for(int d=1;d<=fSearchSpaceDim;d++)
         {
             fXMin[d]=0;
@@ -233,8 +120,8 @@ void SearchSpace::SetSearch()
     {
         fNoObjectives=3;
         fSearchSpaceDim = 8;
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
         for(int d=1;d<=fSearchSpaceDim;d++)
         {
             fXMin[d]=0;
@@ -257,8 +144,8 @@ void SearchSpace::SetSearch()
     {
         fNoObjectives=3;
         fSearchSpaceDim = 8;
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
         for(int d=1;d<=fSearchSpaceDim;d++)
         {
             fXMin[d]=0;
@@ -283,8 +170,8 @@ void SearchSpace::SetSearch()
     {
         fNoObjectives=3;
         fSearchSpaceDim = 2;
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
         for(int d=1;d<=fSearchSpaceDim;d++)
         {
             fXMin[d]=-3;
@@ -307,8 +194,8 @@ void SearchSpace::SetSearch()
     {
         fNoObjectives = 2;
         fSearchSpaceDim = 2;
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
         fXMin[1]=6*sin(PI/12.0);
         fXMax[1]=fXMin[1]+2*PI*cos(PI/12.0);
         fXMin[2]=-2*PI*sin(PI/12.0);
@@ -326,8 +213,8 @@ void SearchSpace::SetSearch()
     {
         fNoObjectives = 2;
         fSearchSpaceDim = 3;
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
         fXMin[1]=-PI;
         fXMax[1]=PI;
         fXMin[2]=-5;
@@ -347,8 +234,8 @@ void SearchSpace::SetSearch()
     {
         fNoObjectives = 2;
         fSearchSpaceDim = 2;
-        fXMin = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
-        fXMax = (double *)calloc((fSearchSpaceDim+1),sizeof(double));
+        fXMin.resize(fSearchSpaceDim+1);
+        fXMax.resize(fSearchSpaceDim+1);
         for(int d=1;d<=fSearchSpaceDim;d++)
         {
             fXMin[d]=0.0;
@@ -370,125 +257,54 @@ void SearchSpace::SetSearch()
     }
 }
 
-// Function which applies the proper fit.
-void SearchSpace::applyFit(int i, int j)
+/**
+  * Function selects the best solutions according to their fitness to be used
+  * for the model function estimation.
+  *
+  * @param[in] iterationNo - The iteration number to sort for.
+  * @param[in] correlationSize - The current size fo the correlation matrix 
+  *
+  */
+void SearchSpace::chooseAndUpdateSolutions(int iterationNo, int correlationSize)
 {
-//    printf("before_applyfit/n");
-//        for (int index=1; index < fSearchSpaceDim+1; index++)
-//        {
-//            printf( "%.5lf ", fXVectors[i][index]);
-//            printf( "%.5lf ", fCostVectors[j][index]);
-//        }
-//    
-//    printf("\n");
-    
-    if(strcmp(fObjectiveFunctionName, "f_kno1")==0)
-    {
-        f_kno1(fXVectors[i], fCostVectors[j]);
-        
-    }
-    else if(strcmp(fObjectiveFunctionName, "f_vlmop2")==0)
-    {
-        f_vlmop2(fXVectors[i], fCostVectors[j]);
-    }
-    else if(strcmp(fObjectiveFunctionName, "f_vlmop3")==0)
-    {
-        f_vlmop3(fXVectors[i], fCostVectors[j]);
-    }
-    else if(strcmp(fObjectiveFunctionName, "f_dtlz1a")==0)
-    {
-        f_dtlz1a(fXVectors[i], fCostVectors[j]);
-        
-    }
-    else if(strcmp(fObjectiveFunctionName, "f_dtlz2a")==0)
-    {
-        f_dtlz2a(fXVectors[i], fCostVectors[j]);
-        
-    }
-    else if(strcmp(fObjectiveFunctionName, "f_dtlz4a")==0)
-    {
-        f_dtlz2a(fXVectors[i], fCostVectors[j]); // this is called but with global variable alph set = 100.0
-       
-    }
-    else if(strcmp(fObjectiveFunctionName, "f_dtlz7a")==0)
-    {
-        f_dtlz7a(fXVectors[i], fCostVectors[j]);
-        
-    }
-    
-    else if(strcmp(fObjectiveFunctionName, "f_oka1")==0)
-    {
-        f_oka1(fXVectors[i], fCostVectors[j]);
-        
-    }
-    else if(strcmp(fObjectiveFunctionName, "f_oka2")==0)
-    {
-        f_oka2(fXVectors[i], fCostVectors[j]);
-    }
-    else
-    {
-        fprintf(stderr, "Didn't recognise that fitness function.\n");
-        exit(0);
-    }
-
-//    printf("after_applyfit/n");
-//    for (int index=1; index < fSearchSpaceDim+1; index++)
-//    {
-//        printf( "%.5lf ", fXVectors[i][index]);
-//        printf( "%.5lf ", fCostVectors[j][index]);
-//    }
-//
-//    
-//    printf("\n");
-}
-
-// Function Name Constructor
-SearchSpace::SearchSpace(const char* name, int max_iter)
-{
-    fObjectiveFunctionName = name;
-    SetSearch();
-    init_arrays(max_iter);
-    alph = 1.0;
-
-}
-
-void SearchSpace::chooseUpdateSolutions(int iter, int correlation_size)
-{    
-    int ind[iter+1];
-    Utilities::mysort(ind, fMeasuredFit, iter);
-    for (int i=1; i<=correlation_size/2; i++)
+    // First half solutions are the fitest solutions.
+    std::vector<int> ind(iterationNo+1);
+    Utilities::mysort(ind, fMeasuredFit, iterationNo);
+    for (int i=1; i<=correlationSize/2; i++)
     {
         for(int d=1;d<=fSearchSpaceDim;d++)
         {
             fSelectedXVectors[i][d] = fXVectors[ind[i]][d];
-            //printf("%lg", fSelectedXVectors[i][d]);
         }
-        
-        fSelectedMeasuredFit[i] = fMeasuredFit[ind[i]];                   // fprintf(stderr, "evaluate\n");
-        //printf("\n tmpay: %lg\n", fSelectedMeasuredFit[i]);
-
+        fSelectedMeasuredFit[i] = fMeasuredFit[ind[i]];
     }
     
-    
-    int *choose;
+    //Second half are chose at random.
+    std::vector<int> choose;
     // cwr(k,n) - choose without replacement k items from n
-    Utilities::cwr(&choose,iter-correlation_size/2,iter-correlation_size/2);
-    for(int i=correlation_size/2+1;i<=correlation_size;i++)
+    Utilities::cwr(choose,iterationNo-correlationSize/2,
+                   iterationNo-correlationSize/2);
+    for(int i=correlationSize/2+1;i<=correlationSize;i++)
     {
-        //asert for bounds in array
-        assert(choose[i-correlation_size/2]+correlation_size/2 <= iter && 0 < choose[i-correlation_size/2]+correlation_size/2);
-        int j= ind[choose[i-correlation_size/2]+correlation_size/2];
-        for(int d=1;d <=fSearchSpaceDim;d++)
+        // Asert for bounds from cwr.
+        assert(choose[i-correlationSize/2]+correlationSize/2 <= iterationNo
+               && 0 < choose[i-correlationSize/2]+correlationSize/2);
+        int j= ind[choose[i-correlationSize/2]+correlationSize/2];
+        for(int d=1;d <=fSearchSpaceDim;d++){
             fSelectedXVectors[i][d] = fXVectors[j][d];
+        }
         fSelectedMeasuredFit[i] = fMeasuredFit[j];
     }
-    
-    free(choose);
-
 }
 
-
-double SearchSpace::Tcheby(double* vec)
+/**
+  * Returns the augmented Tchebycheff measure with normalization
+  * used to scalarize the solution vectors of the function.
+  *
+  * @param[in] vec - The solution vector for which to apply the scalarization.
+  *
+  */
+double SearchSpace::tcheby(const std::vector<double>& vec)
 {
     // the augmented Tchebycheff measure with normalization
     int i;
@@ -500,31 +316,219 @@ double SearchSpace::Tcheby(double* vec)
     
     sum=0.0;
     
-    
-    
     for(i=0;i<fNoObjectives;i++)
     {
-        norm[i] = (vec[i]-fAbsMin[i])/(fAbsMax[i]-fAbsMin[i]);
+        norm[i] = (vec[i+1]-fAbsMin[i])/(fAbsMax[i]-fAbsMin[i]);
         nideal[i] = fIdealObjective[i];
         diff = fWeightVectors[i]*(norm[i]-nideal[i]);
         sum += diff;
         if(diff>d_max)
             d_max = diff;
     }
-    
-    
     // fprintf(out, "d_max= %.5lf + 0.5 * sum= %.5lf\n", d_max, sum);
     return(d_max + 0.05*sum);
 }
 
-double SearchSpace::myfit(int i, int j)
+/**
+ * Applies the corresponding fitness function evaluation.
+ *
+ * @param[in] iterationNo - The iteration for which to calculate the fitness.
+ */
+double SearchSpace::fit(int iterationNo)
 {
-    /* HERE 3
-     Here is where the fitness function is called. Just add in a call for your function here,
-     following this format.*/
     
-    applyFit(i,j);
+    if(strcmp(fObjectiveFunctionName, "f_kno1")==0)
+    {
+        f_kno1(fXVectors[iterationNo], fCostVectors[iterationNo]);
+        
+    }
+    else if(strcmp(fObjectiveFunctionName, "f_vlmop2")==0)
+    {
+        f_vlmop2(fXVectors[iterationNo], fCostVectors[iterationNo]);
+    }
+    else if(strcmp(fObjectiveFunctionName, "f_vlmop3")==0)
+    {
+        f_vlmop3(fXVectors[iterationNo], fCostVectors[iterationNo]);
+    }
+    else if(strcmp(fObjectiveFunctionName, "f_dtlz1a")==0)
+    {
+        f_dtlz1a(fXVectors[iterationNo], fCostVectors[iterationNo]);
+        
+    }
+    else if(strcmp(fObjectiveFunctionName, "f_dtlz2a")==0)
+    {
+        f_dtlz2a(fXVectors[iterationNo], fCostVectors[iterationNo]);
+        
+    }
+    // this is called but with global variable alph set = 100.0
+    else if(strcmp(fObjectiveFunctionName, "f_dtlz4a")==0)
+    {
+        f_dtlz2a(fXVectors[iterationNo], fCostVectors[iterationNo]);
+    }
+    else if(strcmp(fObjectiveFunctionName, "f_dtlz7a")==0)
+    {
+        f_dtlz7a(fXVectors[iterationNo], fCostVectors[iterationNo]);
+        
+    }
+    else if(strcmp(fObjectiveFunctionName, "f_oka1")==0)
+    {
+        f_oka1(fXVectors[iterationNo], fCostVectors[iterationNo]);
+        
+    }
+    else if(strcmp(fObjectiveFunctionName, "f_oka2")==0)
+    {
+        f_oka2(fXVectors[iterationNo], fCostVectors[iterationNo]);
+    }
+    else
+    {
+        fprintf(stderr, "Didn't recognise that fitness function.\n");
+        exit(0);
+    }
     
-    return(Tcheby(&fCostVectors[j][1]));
+    return(tcheby(fCostVectors[iterationNo]));
 }
+
+// The actual test functions.
+/* HERE 2
+ Below are the current fitness function definitions. Add your functions here.
+ The function should take an x and y array and compute the value of the y objectives
+ from the x decision variables. Note that the first decision variable is x[1] and t
+ he first objective is y[1], i.e. there is an offset to the array. */
+
+double static myabs(double v)
+{
+    if(v>=0.0)
+        return v;
+    else
+        return -v;
+}
+
+
+void SearchSpace::f_dtlz1a(const std::vector<double>& x, std::vector<double>& y)
+{
+    
+    
+    double g = 0.0;
+    for(int i=2;i<=fSearchSpaceDim;i++)
+        g+= (x[i]-0.5)*(x[i]-0.5) - cos(2*PI*(x[i]-0.5)); // Note this is 20*PI in Deb's dtlz1 func
+    g += fSearchSpaceDim-1;
+    g *= 100;
+    
+    
+    y[1] = 0.5*x[1]*(1 + g);
+    y[2] = 0.5*(1-x[1])*(1 + g);
+}
+
+void SearchSpace::f_dtlz2a(const std::vector<double>& x, std::vector<double>& y)
+{
+    double g = 0.0;
+    for(int i=3;i<=fSearchSpaceDim;i++)
+        g+=(x[i]-0.5)*(x[i]-0.5);
+    
+    
+    y[1] = (1 + g)*cos(pow(x[1],alph)*PI/2)*cos(pow(x[2],alph)*PI/2);
+    y[2] = (1 + g)*cos(pow(x[1],alph)*PI/2)*sin(pow(x[2],alph)*PI/2);
+    y[3] = (1 + g)*sin(pow(x[1],alph)*PI/2);
+}
+
+void SearchSpace::f_dtlz7a(const std::vector<double>& x, std::vector<double>& y)
+{
+    double g,h,sum;
+    y[1]=x[1];
+    y[2]=x[2];
+    
+    g = 0.0;
+    for(int i=3;i<=fSearchSpaceDim;i++)
+    {
+        g+=x[i];
+    }
+    g*=9.0/(fSearchSpaceDim-fNoObjectives+1);
+    g+=1.0;
+    
+    sum=0.0;
+    for(int i=1;i<=fNoObjectives-1;i++)
+        sum += ( y[i]/(1.0+g) * (1.0+sin(3*PI*y[i])) );
+    h = fNoObjectives - sum;
+    
+    y[1]=x[1];
+    y[2]=x[2];
+    y[3]=(1 + g)*h;
+}
+
+void SearchSpace::f_vlmop3(const std::vector<double>& x, std::vector<double>& y)
+{
+    y[1] = 0.5*(x[1]*x[1]+x[2]*x[2]) + sin(x[1]*x[1]+x[2]*x[2]);
+    y[2] = pow(3*x[1]-2*x[2]+4.0, 2.0)/8.0 + pow(x[1]-x[2]+1, 2.0)/27.0 + 15.0;
+    y[3] = 1.0 / (x[1]*x[1]+x[2]*x[2]+1.0) - 1.1*exp(-(x[1]*x[1]) - (x[2]*x[2]));
+}
+
+void SearchSpace::f_oka1(const std::vector<double>& x, std::vector<double>& y)
+{
+    double x1p = cos(PI/12.0)*x[1] - sin(PI/12.0)*x[2];
+    double x2p = sin(PI/12.0)*x[1] + cos(PI/12.0)*x[2];
+    
+    y[1] = x1p;
+    y[2] = sqrt(2*PI) - sqrt(myabs(x1p)) + 2 * pow(myabs(x2p-3*cos(x1p)-3) ,0.33333333);
+}
+
+
+void SearchSpace::f_oka2(const std::vector<double>& x, std::vector<double>& y)
+{
+    //    printf("oka_2/n");
+    //    for (int j=1; j < fSearchSpaceDim+1; j++)
+    //    {
+    //        printf( "%.5lf ", x[j]);
+    //        printf( "%.5lf ", y[j]);
+    //    }
+    //
+    //    printf("\n");
+    
+    y[1]=x[1];
+    y[2]=1 - (1/(4*PI*PI))*pow(x[1]+PI,2) + pow(myabs(x[2]-5*cos(x[1])),0.333333333) + pow(myabs(x[3] - 5*sin(x[1])),0.33333333);
+    
+    //    printf("after oka_2/n");
+    //    for (int j=1; j < fSearchSpaceDim+1; j++)
+    //    {
+    //        printf( "%.5lf ", x[j]);
+    //        printf( "%.5lf ", y[j]);
+    //    }
+    //
+    //    printf("\n");
+}
+
+void SearchSpace::f_vlmop2(const std::vector<double>& x, std::vector<double>& y)
+{
+    
+    double sum1=0;
+    double sum2=0;
+    
+    for(int i=1;i<=2;i++)
+    {
+        sum1+=pow(x[i]-(1/sqrt(2.0)),2);
+        sum2+=pow(x[i]+(1/sqrt(2.0)),2);
+    }
+    
+    y[1] = 1 - exp(-sum1);
+    y[2] = 1 - exp(-sum2);
+}
+
+void SearchSpace::f_kno1(const std::vector<double>& x, std::vector<double>& y)
+{
+    double f;
+    double g;
+    double c;
+    
+    
+    c = x[1]+x[2];
+    
+    f = 20-( 11+3*sin((5*c)*(0.5*c)) + 3*sin(4*c) + 5 *sin(2*c+2));
+    //  f = 20*(1-(myabs(c-3.0)/3.0));
+    
+    g = (PI/2.0)*(x[1]-x[2]+3.0)/6.0;
+    
+    y[1]= 20-(f*cos(g));
+    y[2]= 20-(f*sin(g));
+    
+}
+
 
