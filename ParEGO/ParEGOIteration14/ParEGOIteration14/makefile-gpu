@@ -1,0 +1,36 @@
+
+CC=g++
+LD=g++
+CFLAGS=-c -Wall -Wno-deprecated -O3 -finline-functions 
+INCLUDE=-I /home/cristina/eigen/Eigen/
+
+all: ParEGOIteration8
+
+ParEGOIteration8: ParEGOIteration8.o Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o Matrix.o
+	$(LD) $(INCLUDE) ParEGOIteration8.o Utilities.o WeightVector.o SearchSpace.o DACE.o GeneticAlgorithm.o Matrix.o -o ParEGOIteration8
+
+ParEGOIteration7.o: ParEGOIteration8.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -cpp ParEGOIteration8.cpp
+
+Matrix.o: Matrix.cpp 
+	$(CC) $(INCLUDE) $(CFLAGS) -cpp Matrix.cpp
+
+Utilities.o: Utilities.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -cpp Utilities.cpp
+
+WeightVector.o: WeightVector.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -cpp WeightVector.cpp
+
+SearchSpace.o: SearchSpace.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -cpp SearchSpace.cpp
+
+DACE.o: DACE.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -cpp DACE.cpp
+
+GeneticAlgorithm.o: GeneticAlgorithm.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -cpp GeneticAlgorithm.cpp
+
+
+
+clean:
+	rm *o ParEGOIteration8
