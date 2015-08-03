@@ -181,7 +181,7 @@
 #define ComplexVectorIndexRangeChecking
 #define ComplexMatrixIndexRangeChecking
 // Use the Eigen library as a first trial for comparison and profiling.
-#include </home/cristina/eigen/Eigen/Dense>
+#include <Dense>
 //#include "nrutil.h"
 
 using namespace std;

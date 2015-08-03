@@ -13,7 +13,7 @@
 #include <utility>
 #include <iostream>
 
-#include </home/cristina/eigen/Eigen/Dense>
+#include <Dense>
 
 #define RN rand()/(RAND_MAX+1.0)
 

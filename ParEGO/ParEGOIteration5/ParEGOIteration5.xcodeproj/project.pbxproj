@@ -39,7 +39,6 @@
 		6B7320E71A83C915006EBBFF /* DACE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DACE.cpp; sourceTree = "<group>"; };
 		6B7320E81A83C915006EBBFF /* DACE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DACE.h; sourceTree = "<group>"; };
 		6B7320FD1A87E9E8006EBBFF /* Utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utilities.cpp; sourceTree = "<group>"; };
-		6B7320FE1A87E9E9006EBBFF /* Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,7 +81,6 @@
 				6B7320E41A82A3A1006EBBFF /* WeightVector.cpp */,
 				6B7320E51A82A3A1006EBBFF /* WeightVector.h */,
 				6B7320FD1A87E9E8006EBBFF /* Utilities.cpp */,
-				6B7320FE1A87E9E9006EBBFF /* Utilities.h */,
 			);
 			path = ParEGOIteration5;
 			sourceTree = "<group>";

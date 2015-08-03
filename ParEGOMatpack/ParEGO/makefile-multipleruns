@@ -1,0 +1,20 @@
+MATPACK = /Users/cristina/projectDev/matpack
+LIBS = $(MATPACK)/matpack.a -lXpm -lX11 -lm -L/usr/X11R6/lib
+INCLUDE = -DXPM_INCLUDE="<X11/xpm.h>" -I$(MATPACK)/include
+
+CC = /opt/local/bin/g++-mp-4.6 -Wno-deprecated
+LD = /opt/local/bin/g++-mp-4.6 -Wno-deprecated
+CFLAGS = $(INCLUDE) -O3 -finline-functions 
+TARGET = ParEGO-100runs
+ParEGO-100runs : ParEGO-100runs.o nrutil.o
+	$(LD) $(CFLAGS) -o ParEGO-100runs ParEGO-100runs.o nrutil.o $(LIBS)	
+
+ParEGO-100runs.o : ParEGO-100runs.cc
+	$(CC) $(CFLAGS) -c ParEGO-100runs.cc
+
+nrutil.o : nrutil.c
+	$(CC) $(CFLAGS) -c nrutil.c
+
+clean: 
+	@/bin/rm -f $(TARGET)	
+	@/bin/rm *.o

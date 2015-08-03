@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 Bianca Cristina Cristescu. All rights reserved.
 //
 #include <stdio.h>
+#include <iostream>
 #include "Matrix.h"
 
 MyMatrix::MyMatrix(size_t m, size_t n)
@@ -13,6 +14,13 @@ MyMatrix::MyMatrix(size_t m, size_t n)
     fN = n;
     fM = m;
     fMatrix = MatrixXd(fN,fM);
+}
+
+MyMatrix::MyMatrix(MyMatrix& matrix)
+{
+    fN = matrix.fN;
+    fM = matrix.fM;
+    fMatrix = matrix.fMatrix;
 }
 
 void MyMatrix::insert(size_t i, size_t j, double val)
@@ -30,10 +38,13 @@ MyMatrix& MyMatrix::operator=(const MyMatrix& A)
 
 const MyMatrix MyMatrix::operator*(const MyMatrix& A)
 {
-    MyMatrix result;
+    MyMatrix result(0,0);
+    result.fMatrix = MatrixXd::Zero(fN, A.fM);
+    cerr << result.fMatrix << "\n";
     result.setN(fN);
     result.setM(A.fM);
     result.fMatrix = fMatrix*A.fMatrix;
+    cerr << result.fMatrix;
     return result;
 }
 

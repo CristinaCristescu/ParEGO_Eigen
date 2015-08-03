@@ -1,0 +1,292 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6BD1CC621A9D0BF50028BFF1 /* Cuda_Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC571A9D0BF50028BFF1 /* Cuda_Utilities.cpp */; };
+		6BD1CC631A9D0BF50028BFF1 /* DACE.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC581A9D0BF50028BFF1 /* DACE.cpp */; };
+		6BD1CC641A9D0BF50028BFF1 /* GeneticAlgorithm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC5A1A9D0BF50028BFF1 /* GeneticAlgorithm.cpp */; };
+		6BD1CC651A9D0BF50028BFF1 /* ParEGOIteration6.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC5C1A9D0BF50028BFF1 /* ParEGOIteration6.cpp */; };
+		6BD1CC661A9D0BF50028BFF1 /* SearchSpace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC5D1A9D0BF50028BFF1 /* SearchSpace.cpp */; };
+		6BD1CC671A9D0BF50028BFF1 /* Utilities.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC5F1A9D0BF50028BFF1 /* Utilities.cpp */; };
+		6BD1CC681A9D0BF50028BFF1 /* WeightVector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC601A9D0BF50028BFF1 /* WeightVector.cpp */; };
+		6BD1CC6C1A9D107E0028BFF1 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6BD1CC6A1A9D107E0028BFF1 /* Matrix.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		6BD1CC4B1A9D0A5D0028BFF1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		6BD1CC4D1A9D0A5D0028BFF1 /* ParEGOIteration6 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ParEGOIteration6; sourceTree = BUILT_PRODUCTS_DIR; };
+		6BD1CC571A9D0BF50028BFF1 /* Cuda_Utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Cuda_Utilities.cpp; path = ParEGOIteration6/Cuda_Utilities.cpp; sourceTree = "<group>"; };
+		6BD1CC581A9D0BF50028BFF1 /* DACE.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DACE.cpp; path = ParEGOIteration6/DACE.cpp; sourceTree = "<group>"; };
+		6BD1CC591A9D0BF50028BFF1 /* DACE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DACE.h; path = ParEGOIteration6/DACE.h; sourceTree = "<group>"; };
+		6BD1CC5A1A9D0BF50028BFF1 /* GeneticAlgorithm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GeneticAlgorithm.cpp; path = ParEGOIteration6/GeneticAlgorithm.cpp; sourceTree = "<group>"; };
+		6BD1CC5B1A9D0BF50028BFF1 /* GeneticAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GeneticAlgorithm.h; path = ParEGOIteration6/GeneticAlgorithm.h; sourceTree = "<group>"; };
+		6BD1CC5C1A9D0BF50028BFF1 /* ParEGOIteration6.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ParEGOIteration6.cpp; path = ParEGOIteration6/ParEGOIteration6.cpp; sourceTree = "<group>"; };
+		6BD1CC5D1A9D0BF50028BFF1 /* SearchSpace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SearchSpace.cpp; path = ParEGOIteration6/SearchSpace.cpp; sourceTree = "<group>"; };
+		6BD1CC5E1A9D0BF50028BFF1 /* SearchSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchSpace.h; path = ParEGOIteration6/SearchSpace.h; sourceTree = "<group>"; };
+		6BD1CC5F1A9D0BF50028BFF1 /* Utilities.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Utilities.cpp; path = ParEGOIteration6/Utilities.cpp; sourceTree = "<group>"; };
+		6BD1CC601A9D0BF50028BFF1 /* WeightVector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = WeightVector.cpp; path = ParEGOIteration6/WeightVector.cpp; sourceTree = "<group>"; };
+		6BD1CC611A9D0BF50028BFF1 /* WeightVector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WeightVector.h; path = ParEGOIteration6/WeightVector.h; sourceTree = "<group>"; };
+		6BD1CC691A9D0DFB0028BFF1 /* Cuda_Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Cuda_Utilities.h; sourceTree = "<group>"; };
+		6BD1CC6A1A9D107E0028BFF1 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Matrix.cpp; path = ParEGOIteration6/Matrix.cpp; sourceTree = "<group>"; };
+		6BD1CC6B1A9D107E0028BFF1 /* Matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Matrix.h; path = ParEGOIteration6/Matrix.h; sourceTree = "<group>"; };
+		6BD1CC6E1A9D10B30028BFF1 /* Cuda_Utilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Cuda_Utilities.h; path = ParEGOIteration6/Cuda_Utilities.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		6BD1CC4A1A9D0A5D0028BFF1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		6BD1CC441A9D0A5D0028BFF1 = {
+			isa = PBXGroup;
+			children = (
+				6BD1CC571A9D0BF50028BFF1 /* Cuda_Utilities.cpp */,
+				6BD1CC581A9D0BF50028BFF1 /* DACE.cpp */,
+				6BD1CC691A9D0DFB0028BFF1 /* Cuda_Utilities.h */,
+				6BD1CC591A9D0BF50028BFF1 /* DACE.h */,
+				6BD1CC5A1A9D0BF50028BFF1 /* GeneticAlgorithm.cpp */,
+				6BD1CC6E1A9D10B30028BFF1 /* Cuda_Utilities.h */,
+				6BD1CC6A1A9D107E0028BFF1 /* Matrix.cpp */,
+				6BD1CC6B1A9D107E0028BFF1 /* Matrix.h */,
+				6BD1CC5B1A9D0BF50028BFF1 /* GeneticAlgorithm.h */,
+				6BD1CC5C1A9D0BF50028BFF1 /* ParEGOIteration6.cpp */,
+				6BD1CC5D1A9D0BF50028BFF1 /* SearchSpace.cpp */,
+				6BD1CC5E1A9D0BF50028BFF1 /* SearchSpace.h */,
+				6BD1CC5F1A9D0BF50028BFF1 /* Utilities.cpp */,
+				6BD1CC601A9D0BF50028BFF1 /* WeightVector.cpp */,
+				6BD1CC611A9D0BF50028BFF1 /* WeightVector.h */,
+				6BD1CC4F1A9D0A5D0028BFF1 /* ParEGOIteration6 */,
+				6BD1CC4E1A9D0A5D0028BFF1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6BD1CC4E1A9D0A5D0028BFF1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6BD1CC4D1A9D0A5D0028BFF1 /* ParEGOIteration6 */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6BD1CC4F1A9D0A5D0028BFF1 /* ParEGOIteration6 */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ParEGOIteration6;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6BD1CC4C1A9D0A5D0028BFF1 /* ParEGOIteration6 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6BD1CC541A9D0A5D0028BFF1 /* Build configuration list for PBXNativeTarget "ParEGOIteration6" */;
+			buildPhases = (
+				6BD1CC491A9D0A5D0028BFF1 /* Sources */,
+				6BD1CC4A1A9D0A5D0028BFF1 /* Frameworks */,
+				6BD1CC4B1A9D0A5D0028BFF1 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ParEGOIteration6;
+			productName = ParEGOIteration6;
+			productReference = 6BD1CC4D1A9D0A5D0028BFF1 /* ParEGOIteration6 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6BD1CC451A9D0A5D0028BFF1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = "Bianca Cristina Cristescu";
+				TargetAttributes = {
+					6BD1CC4C1A9D0A5D0028BFF1 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+				};
+			};
+			buildConfigurationList = 6BD1CC481A9D0A5D0028BFF1 /* Build configuration list for PBXProject "ParEGOIteration6" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 6BD1CC441A9D0A5D0028BFF1;
+			productRefGroup = 6BD1CC4E1A9D0A5D0028BFF1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				6BD1CC4C1A9D0A5D0028BFF1 /* ParEGOIteration6 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6BD1CC491A9D0A5D0028BFF1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6BD1CC6C1A9D107E0028BFF1 /* Matrix.cpp in Sources */,
+				6BD1CC661A9D0BF50028BFF1 /* SearchSpace.cpp in Sources */,
+				6BD1CC681A9D0BF50028BFF1 /* WeightVector.cpp in Sources */,
+				6BD1CC651A9D0BF50028BFF1 /* ParEGOIteration6.cpp in Sources */,
+				6BD1CC671A9D0BF50028BFF1 /* Utilities.cpp in Sources */,
+				6BD1CC631A9D0BF50028BFF1 /* DACE.cpp in Sources */,
+				6BD1CC641A9D0BF50028BFF1 /* GeneticAlgorithm.cpp in Sources */,
+				6BD1CC621A9D0BF50028BFF1 /* Cuda_Utilities.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6BD1CC521A9D0A5D0028BFF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		6BD1CC531A9D0A5D0028BFF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		6BD1CC551A9D0A5D0028BFF1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/cristina/eigen/eigen-eigen-1306d75b4a21/Eigen",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		6BD1CC561A9D0A5D0028BFF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"/Users/cristina/eigen/eigen-eigen-1306d75b4a21/Eigen",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6BD1CC481A9D0A5D0028BFF1 /* Build configuration list for PBXProject "ParEGOIteration6" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6BD1CC521A9D0A5D0028BFF1 /* Debug */,
+				6BD1CC531A9D0A5D0028BFF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6BD1CC541A9D0A5D0028BFF1 /* Build configuration list for PBXNativeTarget "ParEGOIteration6" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6BD1CC551A9D0A5D0028BFF1 /* Debug */,
+				6BD1CC561A9D0A5D0028BFF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6BD1CC451A9D0A5D0028BFF1 /* Project object */;
+}
